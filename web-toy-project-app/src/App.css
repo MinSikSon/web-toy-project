@@ -1,25 +1,39 @@
 .App {
   text-align: center;
+  vertical-align: middle;
 }
 
 .Main 
 {
   display: flex;
+  height: 100vmax;
 }
-.Left
+.Main .Navi
 {
   width:30vmin;
+  height: 100vmax;
   /* height: 100vmin; */
-  color: white;
-  background-color: green;
+  color: black;
+  background-color: beige;
+  /* position: relative; */
+  /* vertical-align: middle; */
+  border-style: outset;
+  /* border-right: 10px; */
+  border-color: white;
+  border-radius: 5px;
+  /* margin-right: 5px; */
+  padding: 7px;
 }
-.Right
+.Main .Right
 {
   /* right: 300px; */
   /* margin-left: 200px; */
-  background-color: white;
+  color: black;
+  background-color: darkgray;
   /* height: 100vmax; */
   width: 100vmax;
+  height: 100vmax;
+  padding: 17px;
 }
 
 .Carousel
