@@ -18,6 +18,7 @@ import img_7 from './img/movie_image_7.jpg'
 import img_8 from './img/movie_image_8.jpg'
 import img_9 from './img/movie_image_9.jpg'
 import img_10 from './img/movie_image_10.jpg'
+import img_test from './img/test.gif'
 
 const img_11 = 'https://raw.githubusercontent.com/ara-official/ARA/master/front-end/img/gauri.jpeg'
 
@@ -153,7 +154,7 @@ class App extends React.Component {
         img_8,
         img_9,
         img_10,
-        img_11,
+        img_test,
       ],
       currentIndex: 10,
       currentName: "Hello, world!",
