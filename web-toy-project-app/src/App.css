@@ -10,7 +10,7 @@
 }
 .Main .Navi
 {
-  width:30vmin;
+  width:50vmin;
   height: 100vmax;
   /* height: 100vmin; */
   color: black;
@@ -23,6 +23,9 @@
   border-radius: 5px;
   /* margin-right: 5px; */
   padding: 7px;
+  padding-top: 50px;
+  font-size: 20px;
+  text-align: center;
 }
 .Main .Right
 {
