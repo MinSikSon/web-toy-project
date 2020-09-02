@@ -1,12 +1,10 @@
 /* boot strap */
 
 import React, { useState } from 'react';
-import logo from './logo.svg';
+// import logo from './logo.svg';
 import './App.css';
 
-import { Toast, Container, Button, Jumbotron } from 'react-bootstrap';
-import { Carousel } from 'react-bootstrap';
-import { render } from 'react-dom';
+import { Button, Jumbotron } from 'react-bootstrap';
 
 import img_1 from './img/movie_image_1.jpg'
 import img_2 from './img/movie_image_2.jpg'
@@ -67,9 +65,9 @@ function ButtonList(props) {
       <Button key={index} variant={GetVariant(props.variant, index)} block onClick={() => props.displayDesc(index)}>{name}</Button>
     );
   });
+  
   return buttons;
 }
-
 
 
 /* Main Component */
