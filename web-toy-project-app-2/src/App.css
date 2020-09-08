@@ -48,7 +48,8 @@
   justify-content: center;
 
   /* height: 20vmin; */
-  height: 240px;
+  /* height: 240px; */
+  height: 15vh;
   /* background-color: #282c34; */
   background-color: #466ECC;
 
@@ -164,4 +165,15 @@
   position: absolute;
   left: 30px;
   top: 100px;
+}
+
+.image
+{
+
+    height: 40vh;
+    /* border */
+    border-style: solid;
+    border-width: thick;
+    border-color: yellow;
+    /* border-radius: 10px; */
 }

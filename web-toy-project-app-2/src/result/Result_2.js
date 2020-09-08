@@ -1,6 +1,7 @@
 
 import React from 'react';
 import '../App.css';
+import score2 from '../img/score_2.png'
 
 class Result_2 extends React.Component {
     render() {
@@ -11,18 +12,13 @@ class Result_2 extends React.Component {
                 </div>
                 <div className="middle">
                     <div className="middle-top">
+                        2
                         <div className="quizDesc">
+                            2
                         </div>
                     </div>
                     <div className="middle-bottom">
-                        <div>
-                        </div>
-                        <br />
-                        <div>
-                            <br />
-                            <div className="text_1">
-                            </div>
-                        </div>
+                        <img className="image" src={score2} />
                     </div>
                 </div>
                 <div className="bottom">

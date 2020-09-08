@@ -8,7 +8,7 @@ import { Button } from 'react-bootstrap';
 function CopyButton(props) {
     return (
         <CopyToClipboard className="floatBtn" text={props.url}>
-            <Button variant="dark" onClick={() => props.PopUp(props.url)}>copy url</Button>
+            <Button variant="dark" onClick={() => props.PopUp(props.url)}>URL COPY!!</Button>
         </CopyToClipboard>
     );
 }
