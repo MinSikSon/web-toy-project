@@ -47,7 +47,6 @@ function ToggleButtonExample(props) {
                             // checked={radioValue === radio.value}
                             // onChange={(e) => setRadioValue(e.currentTarget.value)}
                             onChange={(e) => props.onClicked(e.currentTarget.value)}
-                            // onClick={() => props.SetAnswer()}
                             size="lg"
                         // block
                         >
@@ -152,7 +151,7 @@ class Main extends React.Component {
         this.UpdateDesc = this.UpdateDesc.bind(this)
         this.SetNextChoiceDesc = this.SetNextChoiceDesc.bind(this)
         this.SetAnswer = this.SetAnswer.bind(this)
-        this.CalculateTopHeight = this.CalculateTopHeight.bind(this)
+        this.SetCSSInfo = this.SetCSSInfo.bind(this)
     }
 
     UpdateQuizNumber() {
@@ -216,8 +215,6 @@ class Main extends React.Component {
             }]),
             historyCount: history.length,
         });
-
-        // alert("answers: " + answers)
     }
 
     CalculateScore() {
@@ -225,7 +222,6 @@ class Main extends React.Component {
         const current = history[history.length - 1];
         const answers = current.quizAnswer.slice();
 
-        // alert(answers)
         let score = 0;
         for (let i = 0; i < NUM_QUIZ; i++) {
             // 문자와 숫자 비교라, === 로 하면 점수 0점 나옴.
@@ -237,88 +233,71 @@ class Main extends React.Component {
         return score;
     }
 
-    CalculateTopHeight()
+    SetCSSInfo()
     {
         const innerWidth = window.innerWidth;
-        // alert("CalculateTopHeight: innerWidth: " + innerWidth)
         // const innerHeight = window.innerHeight;
-        let height = 0;
+        let top_height = 0;
         let middle_font = 0;
         let middle_font_2 = 0;
         let middle_height = 0;
-        // 500 ~ 580 px
-        if (innerWidth >= 500 && innerWidth < 580)
+        
+        if (innerWidth >= 500 && innerWidth < 580) // 500 ~ 580 px
         {
-            height = 180;
+            top_height = 180;
             middle_font = 30;
             middle_font_2 = 20;
             middle_height = 655;
         }
         else
         {
-            height = 210; // px
+            top_height = 210; // px
             middle_font = 35;
             middle_font_2 = 25;
             middle_height = 605;
         }
 
         this.setState({
-            top_height: height,
+            top_height: top_height,
             middle_height: middle_height,
             middle_font: middle_font,
             middle_font_2: middle_font_2,
         });
-
-        // alert(height + ", "+ this.state.top_height);
     }
 
-    componentDidUpdate(prevProps)
-    {
-        // alert("componentDidUpdate()")
-        if(this.props.top_height !== prevProps.top_height)
-        {
-            // alert(this.props.top_height);
-            // alert(prevProps.top_height);
-        }
-    }
-
+    // https://ko.reactjs.org/docs/react-component.html#componentdidmount
+    // MOUNT: https://ko.reactjs.org/docs/react-component.html#mounting
     componentDidMount()
     {
-        // alert("componentDidMount()")
-
         // css
-        this.CalculateTopHeight()
+        this.SetCSSInfo()
     }
 
-    // link 사용하면 url 도 바뀔 듯?
     render() {
-        // alert("render()")
         // css
-        const height = {height: this.state.top_height };
-        const style_middle = {"font-size": this.state.middle_font };
-        const middle_font_2 = {"font-size": this.state.middle_font_2 };
-        const middle_height = {height: this.state.middle_height};
-        // alert(this.state.top_height)
+        const style_top = {height: this.state.top_height };
+        const style_middle = {height: this.state.middle_height};
+        const style_middle_top = {"font-size": this.state.middle_font };
+        const style_middle_2 = {"font-size": this.state.middle_font_2 };
 
+        // NOTE: Quiz 종료
         if (this.state.quizEnd === true) {
             const score = this.CalculateScore();
             // alert("score: " + score)
             return (<ResultMain score={score}/>);
         }
+        // NOTE: Quiz 화면
         else {
             return (
                 <div className="App">
-                    <div className="top" style={height}>
-                        {/* <img src={movie_image} className="App-logo" alt="logo" /> */}
+                    <div className="top" style={style_top}>
                         <img src={sms} className="App-logo" alt="logo" />
                         <div className="App-logo" alt="logo">이 친구에 대해 알아보자</div>
-                        {/* <div className="App-logo" alt="logo">그만 알아보자,,</div> */}
-                        {/* {this.state.currentQuizNumber}/{NUM_QUIZ} */}
                     </div>
-                    <div className="middle" style={middle_height}>
-                        <div className="middle-top" style={style_middle}>
+                    <div className="middle" style={style_middle}>
+                        <div className="middle-top" style={style_middle_top}>
                             {this.state.currentQuizNumber + 1}단계 도전!
-                            <div className="quizDesc" style={middle_font_2}>
+                            <div className="quizDesc" style={style_middle_2}>
                                 {quizDesc[this.state.currentQuizNumber]}
                             </div>
                         </div>
@@ -332,7 +311,6 @@ class Main extends React.Component {
                                     name_4={this.state.choiceDesc_3}
 
                                     onClicked={this.SetAnswer}
-                                // SetAnswer={this.SetAnswer}
                                 >
                                 </ToggleButtonExample>
                             </div>
@@ -356,7 +334,6 @@ class Main extends React.Component {
                 </div>
             );
         }
-
     };
 }
 
