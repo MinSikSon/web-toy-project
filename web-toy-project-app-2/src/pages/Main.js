@@ -140,12 +140,19 @@ class Main extends React.Component {
             currentQuizNumber: 0,
             maxQuizNumber: NUM_QUIZ,
             quizEnd: false,
-            text_next: "다음으로"
+            text_next: "다음으로",
+
+            // css
+            top_height: 0,
+            middle_font: 0,
+            middle_font_2: 0,
+            middle_height: 0,
         }
         this.UpdateQuizNumber = this.UpdateQuizNumber.bind(this)
         this.UpdateDesc = this.UpdateDesc.bind(this)
         this.SetNextChoiceDesc = this.SetNextChoiceDesc.bind(this)
         this.SetAnswer = this.SetAnswer.bind(this)
+        this.CalculateTopHeight = this.CalculateTopHeight.bind(this)
     }
 
     UpdateQuizNumber() {
@@ -230,28 +237,88 @@ class Main extends React.Component {
         return score;
     }
 
+    CalculateTopHeight()
+    {
+        const innerWidth = window.innerWidth;
+        // alert("CalculateTopHeight: innerWidth: " + innerWidth)
+        // const innerHeight = window.innerHeight;
+        let height = 0;
+        let middle_font = 0;
+        let middle_font_2 = 0;
+        let middle_height = 0;
+        // 500 ~ 580 px
+        if (innerWidth >= 500 && innerWidth < 580)
+        {
+            height = 180;
+            middle_font = 30;
+            middle_font_2 = 20;
+            middle_height = 655;
+        }
+        else
+        {
+            height = 210; // px
+            middle_font = 35;
+            middle_font_2 = 25;
+            middle_height = 605;
+        }
+
+        this.setState({
+            top_height: height,
+            middle_height: middle_height,
+            middle_font: middle_font,
+            middle_font_2: middle_font_2,
+        });
+
+        // alert(height + ", "+ this.state.top_height);
+    }
+
+    componentDidUpdate(prevProps)
+    {
+        // alert("componentDidUpdate()")
+        if(this.props.top_height !== prevProps.top_height)
+        {
+            // alert(this.props.top_height);
+            // alert(prevProps.top_height);
+        }
+    }
+
+    componentDidMount()
+    {
+        // alert("componentDidMount()")
+
+        // css
+        this.CalculateTopHeight()
+    }
+
     // link 사용하면 url 도 바뀔 듯?
     render() {
+        // alert("render()")
+        // css
+        const height = {height: this.state.top_height };
+        const style_middle = {"font-size": this.state.middle_font };
+        const middle_font_2 = {"font-size": this.state.middle_font_2 };
+        const middle_height = {height: this.state.middle_height};
+        // alert(this.state.top_height)
+
         if (this.state.quizEnd === true) {
             const score = this.CalculateScore();
             // alert("score: " + score)
             return (<ResultMain score={score}/>);
         }
         else {
-
             return (
                 <div className="App">
-                    <div className="top">
+                    <div className="top" style={height}>
                         {/* <img src={movie_image} className="App-logo" alt="logo" /> */}
                         <img src={sms} className="App-logo" alt="logo" />
                         <div className="App-logo" alt="logo">이 친구에 대해 알아보자</div>
                         {/* <div className="App-logo" alt="logo">그만 알아보자,,</div> */}
                         {/* {this.state.currentQuizNumber}/{NUM_QUIZ} */}
                     </div>
-                    <div className="middle">
-                        <div className="middle-top">
+                    <div className="middle" style={middle_height}>
+                        <div className="middle-top" style={style_middle}>
                             {this.state.currentQuizNumber + 1}단계 도전!
-                            <div className="quizDesc">
+                            <div className="quizDesc" style={middle_font_2}>
                                 {quizDesc[this.state.currentQuizNumber]}
                             </div>
                         </div>
