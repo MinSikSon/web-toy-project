@@ -11,39 +11,39 @@
 <body>
     <table>
         <tr id="tr_6">
-            <td id="td_6" colspan="4">🇰🇷&nbsp;&nbsp;👩🏻&nbsp;&nbsp;😀</td>
+            <td id="td_6" colspan="4" onclick="win_close();">🇰🇷&nbsp;&nbsp;👩🏻&nbsp;&nbsp;🥑</td>
         </tr>
         <tr id="tr_5">
-            <td id="td_5" colspan="4">0</td>
+            <td id="td_display" colspan="4">0</td>
         </tr>
         <tr id="tr_4">
-            <td id="test" onclick="click_number(this.id)">AC</td>
-            <td>+/-</td>
-            <td>%</td>
-            <td id="td_4">/</td>
+            <td id="td_ac" onclick="click_number(this.id)">AC</td>
+            <td id="td_swap" onclick="swap()">+/-</td>
+            <td id="td_percent" onclick="percent()">%</td>
+            <td id="td_4" onclick="click_rules(this.id)">÷</td>
         </tr>
         <tr id="tr_3">
             <td id="num_7" onclick="click_number(this.id)">7</td>
             <td id="num_8" onclick="click_number(this.id)">8</td>
             <td id="num_9" onclick="click_number(this.id)">9</td>
-            <td id="td_3">*</td>
+            <td id="td_3" onclick="click_rules(this.id)">×</td>
         </tr>
         <tr id="tr_2">
             <td id="num_4" onclick="click_number(this.id)">4</td>
             <td id="num_5" onclick="click_number(this.id)">5</td>
             <td id="num_6" onclick="click_number(this.id)">6</td>
-            <td id="td_2">-</td>
+            <td id="td_2" onclick="click_rules(this.id)">−</td>
         </tr>
         <tr id="tr_1">
             <td id="num_1" onclick="click_number(this.id)">1</td>
             <td id="num_2" onclick="click_number(this.id)">2</td>
             <td id="num_3" onclick="click_number(this.id)">3</td>
-            <td id="td_1">+</td>
+            <td id="td_1" onclick="click_rules(this.id)">+</td>
         </tr>
         <tr id="tr_0">
-            <td id="num_0" onclick="click_number(this.id)" colspan="2">0</td>
-            <td>.</td>
-            <td id="td_0">=</td>
+            <td id="num_0" onclick="click_number(this.id)" colspan="2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0</td>
+            <td id="td_point" onclick="set_point()">.</td>
+            <td id="td_0" onclick="click_rules(this.id)">=</td>
         </tr>
     </table>
 </body>

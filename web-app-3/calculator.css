@@ -1,14 +1,14 @@
 /*
 [작업 로그]
-09-19(토): 새벽 2 ~ 4 ) CSS 작업(OS X 계산기 스타일) 및, onclick event 작업 (숫자)
+09-19(토): 새벽 2 ~ 4 ) CSS 작업(OS X 계산기 스타일) 및, onclick event 작업 (숫자 클릭)
 */
 
 * {
     /* text-align: center; */
-    font-size: 18px;
+    font-size: 20px;
     color:white;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    font-weight: 280;
+    font-weight: 260;
 }
 
 table {
@@ -16,8 +16,9 @@ table {
     height: 322px;
     background-color: rgb(94,90,87);
     /* border: 1px solid; */
-    box-shadow: 10px 10px 55px rgb(110,110,110);
+    box-shadow: 15px 20px 55px rgb(110,110,110);
     border-radius: 4px;
+    border-spacing: 1px;
 }
 td{
     width:25%;
@@ -31,6 +32,15 @@ tr{
     background-color: rgb(133,130,128);
 }
 
+#num_0{
+    text-align: left;
+}
+
+#td_ac{
+    font-size: 18px;
+    /* font-weight: 120; */
+}
+
 #td_6 {
     font-size: 10px;
     font-weight: 120;
@@ -38,18 +48,22 @@ tr{
     height: 15px;
     background-color: rgb(94,90,87);
 }
-#td_5 {
+#td_display {
     font-size: 46px;
     font-weight: 120;
     text-align: right;
-    height: 56px;
+    height: 58px;
     background-color: rgb(94,90,87);
 }
+
 #tr_4 {
     background-color: rgb(109,105,102);
 }
 
 #td_0, #td_1, #td_2, #td_3, #td_4{
+    font-size: 32px;
+    font-weight: 200;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     background-color:rgb(254,158,9);
 }
 #td_0:hover, #td_1:hover, #td_2:hover, #td_3:hover, #td_4:hover{
@@ -73,3 +87,4 @@ tr#tr_1 {
 tr#tr_0 {
     background-color: cadetblue;
 } */
+
