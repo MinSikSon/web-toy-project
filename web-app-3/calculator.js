@@ -1,11 +1,12 @@
 // 사칙연산 logic 먼저 짜야할 듯,,,
 
 /* global variables */
-RESET_NUMBER = 0xffffffff;
-INVALID = 0xffffffff;
-VALID = 0xfffffffe;
+RESET_NUMBER = 0xfedcfedc;
+INVALID = 0xfedcfedc;
+VALID = 0xfedcfedd;
 let gSum = 0
-let gNumberOfDigit = 0;
+let gUnderDecimal = 0;
+let gUnderDecimalNonZero = 0;
 let gOldNumber = 0;
 let gCurrentNumber = INVALID;
 let gBackup = 0;
@@ -13,7 +14,7 @@ let gRule = INVALID;
 let gPoint = false;
 
 function DEBUG() {
-    console.log("gSum: " + gSum + ", gOldNumber: " + gOldNumber + ", gCurrentNumber: " + gCurrentNumber + ", gRule: " + gRule + ", gPoint: " + gPoint + ", gNumberOfDigit: " + gNumberOfDigit);
+    console.log("gSum: " + gSum + ", gOldNumber: " + gOldNumber + ", gCurrentNumber: " + gCurrentNumber + ", gRule: " + gRule + ", gPoint: " + gPoint + ", gUnderDecimal: " + gUnderDecimal);
 }
 
 function click_number(id) {
@@ -50,7 +51,8 @@ function click_number(id) {
 function click_rules(id) {
     // point
     gPoint = false;
-    gNumberOfDigit = 0;
+    gUnderDecimal = 0;
+    gUnderDecimalNonZero = 0;
 
     let doPostProcess = false;
     if (gRule === INVALID) {
@@ -151,7 +153,7 @@ function rule_division() {
     gRule = "/";
 }
 
-function swap() {
+function click_swap() {
     if (gCurrentNumber === INVALID) {
         if (gOldNumber !== INVALID) {
             gOldNumber = gOldNumber * (-1);
@@ -165,7 +167,7 @@ function swap() {
     }
 }
 
-function percent() {
+function click_percent() {
     if (gCurrentNumber === INVALID) {
         if (gOldNumber !== INVALID) {
             gOldNumber = gOldNumber * (0.01);
@@ -178,26 +180,10 @@ function percent() {
     }
 }
 
-// NOT USED
-function post_processing() {
-    console.log("[post_processing]");
-
-    let tmp = 0;
-    switch (gRule) {
-        case "=":
-            gOldNumber
-            gRule = INVALID;
-            break;
-        case "+":
-            tmp = gOldNumber + gCurrentNumber;
-            gOldNumber = tmp;
-    }
-}
-
-
 function all_clear() {
     gSum = 0;
-    gNumberOfDigit = 0;
+    gUnderDecimal = 0;
+    gUnderDecimalNonZero = 0;
     gCurrentNumber = INVALID;
     gBackup = 0;
     gOldNumber = INVALID;
@@ -218,9 +204,42 @@ function set_number(num) {
         gCurrentNumber = 0;
     }
     // caculator
+    let strCurrentNumber = "";
     if (gPoint === true) {
-        gNumberOfDigit++;
-        gCurrentNumber = gCurrentNumber + (num / Math.pow(10, gNumberOfDigit));
+        gUnderDecimal++;
+        gCurrentNumber = gCurrentNumber + (num / Math.pow(10, gUnderDecimal));
+        if (num === 0)
+        {
+            if (gCurrentNumber === 0)
+            {
+                strCurrentNumber = "0.";
+
+            }
+            else
+            {
+                strCurrentNumber = gCurrentNumber;
+            }
+
+            // console.log("gCurrentNumber len: " + (gCurrentNumber + "").length + ", gUnderDecimal: " + gUnderDecimal + ", gUnderDecimalNonZero: " + gUnderDecimalNonZero);
+            if (gUnderDecimal === 1)
+            {
+                strCurrentNumber += ".";
+            }
+            else if(gUnderDecimalNonZero === 0)
+            {
+                strCurrentNumber += ".";
+            }
+
+            for(let i = 0; i < (gUnderDecimal - gUnderDecimalNonZero); i++)
+            {
+
+                strCurrentNumber += "0";
+            }
+        }
+        else
+        {
+            gUnderDecimalNonZero = gUnderDecimal;
+        }
     }
     else {
         gCurrentNumber *= 10;
@@ -231,7 +250,15 @@ function set_number(num) {
 
     set_display_font_size(true);
 
-    document.getElementById("td_display").innerText = gCurrentNumber;
+    console.log("!! gCurrentNumber: " + gCurrentNumber);
+    if (gPoint === true && num === 0)
+    {
+        document.getElementById("td_display").innerText = strCurrentNumber;
+    }
+    else
+    {
+        document.getElementById("td_display").innerText = gCurrentNumber;
+    }
 }
 
 function set_display_font_size(bCheckCurrentOnly)
@@ -295,7 +322,7 @@ function set_display_font_size(bCheckCurrentOnly)
     document.getElementById("td_display").setAttribute("style", "font-size:" + px + "px;");
 }
 
-function set_point() {
+function click_point() {
     if (gPoint === false) {
         if (gCurrentNumber === INVALID) {
             document.getElementById("td_display").innerText = "0.";
@@ -310,7 +337,6 @@ function set_point() {
 
     }
 }
-
 
 // 브라우저 창 닫기 : 동작 안함
 function win_close() {

@@ -48,6 +48,9 @@ tr{
     height: 15px;
     background-color: rgb(94,90,87);
 }
+#tr_5{
+    width: 234px;
+}
 #td_display {
     font-size: 46px;
     font-weight: 120;
