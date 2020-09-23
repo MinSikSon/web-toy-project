@@ -4,10 +4,12 @@
 RESET_NUMBER = 0xfedcfedc;
 INVALID = 0xfedcfedc;
 VALID = 0xfedcfedd;
+// null, undefined
+
 let gSum = 0
 let gUnderDecimal = 0;
 let gUnderDecimalNonZero = 0;
-let gOldNumber = 0;
+let gOldNumber = INVALID;
 let gCurrentNumber = INVALID;
 let gBackup = 0;
 let gRule = INVALID;
@@ -35,6 +37,8 @@ function click_number(id) {
         case "num_9": num = 9; break;
         default: console.warn("[ERROR] [click_number]"); break;
     }
+    // id 를 숫자로?
+    // string 자르는 방법도 있음.
 
     if (num === RESET_NUMBER) {
         all_clear();
@@ -49,6 +53,8 @@ function click_number(id) {
 }
 
 function click_rules(id) {
+    DEBUG();
+
     // point
     gPoint = false;
     gUnderDecimal = 0;
@@ -204,6 +210,7 @@ function set_number(num) {
         gCurrentNumber = 0;
     }
     // caculator
+    // 리팩!strCurrentNumber
     let strCurrentNumber = "";
     if (gPoint === true) {
         gUnderDecimal++;
@@ -213,7 +220,6 @@ function set_number(num) {
             if (gCurrentNumber === 0)
             {
                 strCurrentNumber = "0.";
-
             }
             else
             {
@@ -221,23 +227,26 @@ function set_number(num) {
             }
 
             // console.log("gCurrentNumber len: " + (gCurrentNumber + "").length + ", gUnderDecimal: " + gUnderDecimal + ", gUnderDecimalNonZero: " + gUnderDecimalNonZero);
-            if (gUnderDecimal === 1)
+            if (strCurrentNumber !== "0.")
             {
-                strCurrentNumber += ".";
-            }
-            else if(gUnderDecimalNonZero === 0)
-            {
-                strCurrentNumber += ".";
+                if (gUnderDecimal === 1)
+                {
+                    strCurrentNumber += ".";
+                }
+                else if(gUnderDecimalNonZero === 0)
+                {
+                    strCurrentNumber += ".";
+                }
             }
 
             for(let i = 0; i < (gUnderDecimal - gUnderDecimalNonZero); i++)
             {
-
                 strCurrentNumber += "0";
             }
         }
         else
         {
+            
             gUnderDecimalNonZero = gUnderDecimal;
         }
     }
@@ -334,7 +343,6 @@ function click_point() {
 
         gPoint = true;
         DEBUG();
-
     }
 }
 
