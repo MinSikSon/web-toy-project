@@ -1,17 +1,29 @@
 import React from 'react';
 import '../App.css';
 
-import { Result_0, Result_1, Result_2, Result_3, Result_4, Result_5 } from '.';
+// import { Result_0, Result_1, Result_2, Result_3, Result_4, Result_5 } from '.';
+// import { Result_0, Result_1, Result_2, Result_3, Result_4, Result_5 } from '../result'
+import { Result_0, Result_1, Result_2, Result_3, Result_4, Result_5 } from '.'
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { Button } from 'react-bootstrap';
 
-function CopyButton(props) {
+class CopyButton extends React.Component
+{
+    render()
+    {
     return (
         <CopyToClipboard className="floatBtn" text={props.url}>
             <Button variant="dark" onClick={() => props.PopUp(props.url)}>URL COPY!!</Button>
         </CopyToClipboard>
-    );
+    )};
 }
+// function CopyButton(props) {
+//     return (
+//         <CopyToClipboard className="floatBtn" text={props.url}>
+//             <Button variant="dark" onClick={() => props.PopUp(props.url)}>URL COPY!!</Button>
+//         </CopyToClipboard>
+//     );
+// }
 
 class ResultMain extends React.Component {
     constructor(props) {

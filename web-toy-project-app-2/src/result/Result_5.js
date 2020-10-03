@@ -12,7 +12,7 @@ class Result_5 extends React.Component {
                 </div>
                 <div className="middle">
                     <div className="middle-top">
-                        넌 나고 난너야
+                        넌 나고 난 너야
                         <div className="quizDesc">
                             난 너고 넌 나야
                         </div>

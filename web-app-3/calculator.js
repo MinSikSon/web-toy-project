@@ -174,15 +174,32 @@ function click_swap() {
 }
 
 function click_percent() {
-    if (gCurrentNumber === INVALID) {
-        if (gOldNumber !== INVALID) {
+    DEBUG();
+    if (gCurrentNumber === INVALID) 
+    {
+        if (gOldNumber !== INVALID) 
+        {
             gOldNumber = gOldNumber * (0.01);
             document.getElementById("td_display").innerHTML = gOldNumber;
         }
     }
-    else {
+    else 
+    {
         gCurrentNumber = gCurrentNumber * (0.01);
         document.getElementById("td_display").innerHTML = gCurrentNumber;
+        let tmpStr = String(gCurrentNumber);
+        let pointIndex = tmpStr.indexOf(".");
+        console.log("tmpStr: " + tmpStr + ", pointIndex: " + pointIndex);
+        if (pointIndex !== -1)
+        {
+            let strLen = tmpStr.length;
+            gPoint = true;
+            gUnderDecimal += (strLen - pointIndex - 2);
+            console.log("strLen: " + strLen + ", gUnderDecimal: " + gUnderDecimal);
+            gUnderDecimalNonZero = gUnderDecimal;
+
+            DEBUG();
+        }
     }
 }
 
@@ -213,6 +230,7 @@ function set_number(num) {
     // 리팩!strCurrentNumber
     let strCurrentNumber = "";
     if (gPoint === true) {
+        DEBUG();
         gUnderDecimal++;
         gCurrentNumber = gCurrentNumber + (num / Math.pow(10, gUnderDecimal));
         if (num === 0)

@@ -11,13 +11,14 @@ import { Button, ButtonGroup, ToggleButton} from 'react-bootstrap';
 // import movie_image from '../img/movie_image_1.jpg'
 import sms from '../img/sms.jpeg'
 
-import { ResultMain, Result_0, Result_1, Result_2, Result_3, Result_4, Result_5 } from '../result'
+import { ResultMain } from '../result'
 
 
 /* const */
 const NUM_QUIZ = 5;
 
-function ToggleButtonExample(props) {
+function ToggleButtonExample(props)
+{
     // Hook 도입 이유: [안봐도 됨] https://ko.reactjs.org/docs/hooks-intro.html
     // Hook 사용 방법: https://ko.reactjs.org/docs/hooks-overview.html
     // 쉽게 생각해, 함수 컴포넌트 안에서 state 를 사용할 수 있게 만들어 주는게 Hook 인 듯 싶다.
@@ -46,7 +47,7 @@ function ToggleButtonExample(props) {
                             value={radio.value}
                             // checked={radioValue === radio.value}
                             // onChange={(e) => setRadioValue(e.currentTarget.value)}
-                            onChange={(e) => props.onClicked(e.currentTarget.value)}
+                            onChange={(e) => props.onClicked(e.currentTarget.value)} // e.currentTarget.value: ToggleButton 의 value 를 가져옴
                             size="lg"
                         // block
                         >
@@ -318,7 +319,8 @@ class Main extends React.Component {
                             <div>
                                 <CustomButton
                                     variant="dark"
-                                    text={this.state.text_next} UpdateDesc={this.UpdateDesc}
+                                    text={this.state.text_next}
+                                    UpdateDesc={this.UpdateDesc}
                                 >
                                 </CustomButton>
                                 <br />
