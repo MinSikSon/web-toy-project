@@ -1,11 +1,11 @@
 // 사칙연산 logic 먼저 짜야할 듯,,,
 
 /* global variables */
-RESET_NUMBER = 0xfedcfedc;
-INVALID = 0xfedcfedc;
-VALID = 0xfedcfedd;
+RESET_NUMBER = null;
+INVALID = null;
 // null, undefined
 
+// TODO: oldnumber 를 알기 쉽게 변경, currentnumber 도 마찬가지. backup 도 왜 필요한지..
 let gSum = 0
 let gUnderDecimal = 0;
 let gUnderDecimalNonZero = 0;
@@ -14,52 +14,44 @@ let gCurrentNumber = INVALID;
 let gBackup = 0;
 let gRule = INVALID;
 let gPoint = false;
-
-function DEBUG() {
-    console.log("gSum: " + gSum + ", gOldNumber: " + gOldNumber + ", gCurrentNumber: " + gCurrentNumber + ", gRule: " + gRule + ", gPoint: " + gPoint + ", gUnderDecimal: " + gUnderDecimal);
+let DEBUG = false;
+function debug() {
+    if (DEBUG === true)
+    {
+        console.log("["+arguments.callee.name+"] " + "gSum: " + gSum + ", gOldNumber: " + gOldNumber + ", gCurrentNumber: " + gCurrentNumber + ", gRule: " + gRule + ", gPoint: " + gPoint + ", gUnderDecimal: " + gUnderDecimal);
+    }
 }
 
 function click_number(id) {
-    console.log("[click_number] id: " + id);
+    console.log("["+arguments.callee.name+"]");
+    console.log("id: " + id);
 
-    let num = 0;
-    switch (id) {
-        case "td_ac": num = RESET_NUMBER; break;
-        case "num_0": num = 0; break;
-        case "num_1": num = 1; break;
-        case "num_2": num = 2; break;
-        case "num_3": num = 3; break;
-        case "num_4": num = 4; break;
-        case "num_5": num = 5; break;
-        case "num_6": num = 6; break;
-        case "num_7": num = 7; break;
-        case "num_8": num = 8; break;
-        case "num_9": num = 9; break;
-        default: console.warn("[ERROR] [click_number]"); break;
-    }
-    // id 를 숫자로?
-    // string 자르는 방법도 있음.
-
-    if (num === RESET_NUMBER) {
+    if (id === "all_clear")
+    {
         all_clear();
-        document.getElementById("td_ac").innerText = "AC";
+        // document.getElementById("all_clear").innerText = "AC";
+        jQuery("#all_clear").text("AC");
     }
-    else {
+    else if (id >= 0 && id <= 9)
+    {
         if (gSum === 0) {
-            document.getElementById("td_ac").innerText = "C";
+            // document.getElementById("all_clear").innerText = "C";
+            $("#all_clear").text("C");
         }
-        set_number(num);
+        set_number(Number(id)); // Number() 를 사용해도 되고, id + 0 같이 연산을 하더라도 int 로 자동 변환 됨.
+    }
+    else
+    {
+        console.error("["+arguments.callee.name+"] ERROR");
     }
 }
 
 function click_rules(id) {
-    DEBUG();
+    console.log("["+arguments.callee.name+"]");
+    debug();
 
-    // point
-    gPoint = false;
-    gUnderDecimal = 0;
-    gUnderDecimalNonZero = 0;
-
+    point_clear();
+    
     let doPostProcess = false;
     if (gRule === INVALID) {
 
@@ -75,16 +67,17 @@ function click_rules(id) {
 
     let tmpRule = gRule;
     switch (id) {
-        case "td_0": rule_equal(); break; // =
-        case "td_1": rule_plus(); break; // +
-        case "td_2": rule_substract(); break; // -
-        case "td_3": rule_multiply(); break; // *
-        case "td_4": rule_division(); break; // / 
+        case "rule_equal": rule_equal(); break; // =
+        case "rule_plus": gRule = "+"; break; // +
+        case "rule_substract": gRule = "-"; break; // -
+        case "rule_multiply": gRule = "*"; break; // *
+        case "rule_division": gRule = "/"; break; // / 
         default: console.warn("[ERROR] [click_gRules]"); break;
     }
 
+    // TODO: refac
     if (doPostProcess == true) {
-        if (id !== "td_0") {
+        if (id !== "rule_equal") {
             let tmpRule2 = gRule;
             if (gRule !== tmpRule) {
                 gRule = tmpRule;
@@ -104,89 +97,70 @@ function click_rules(id) {
             gRule = tmpRule2;
 
             gBackup = gCurrentNumber;
-            document.getElementById("td_display").innerText = gOldNumber;
+            // document.getElementById("calculator_display").innerText = gOldNumber;
+            $("#calculator_display").text(gOldNumber);
         }
         gCurrentNumber = INVALID;
     }
     else {
         if (gRule === "/") {
             if (gCurrentNumber === 0) {
-                document.getElementById("td_display").innerText = "숫자 아님";
+                // document.getElementById("calculator_display").innerText = "숫자 아님";
+                $("#calculator_display").text("숫자 아님");
             }
         }
     }
 
-    console.log("gRule: " + gRule);
-    console.log("gOldNumber: " + gOldNumber + ", gCurrentNumber: " + gCurrentNumber);
+    debug();
 }
 function rule_equal() {
-    let tmp = 0;
-    DEBUG();
+    console.log("["+arguments.callee.name+"]");
     switch (gRule) {
-        case "+":
-            tmp = gOldNumber + gBackup;
-            gOldNumber = tmp;
-            break;
-        case "-":
-            tmp = gOldNumber - gBackup;
-            gOldNumber = tmp;
-            break;
-        case "*":
-            tmp = gOldNumber * gBackup;
-            gOldNumber = tmp;
-            break;
-        case "/":
-            tmp = gOldNumber / gBackup;
-            gOldNumber = tmp;
-            break;
-        default: console.warn("[ERROR] [click_gRules]"); break;
+        case "+": gOldNumber += gBackup; break;
+        case "-": gOldNumber -= gBackup; break;
+        case "*": gOldNumber *= gBackup; break;
+        case "/": gOldNumber /= gBackup; break;
+        default: console.warn("["+arguments.callee.name+"] ERROR"); break;
     }
-    DEBUG();
 
-    set_display_font_size(false);
-    document.getElementById("td_display").innerText = tmp;
-}
-function rule_plus() {
-    gRule = "+";
-}
-function rule_substract() {
-    gRule = "-";
-}
-function rule_multiply() {
-    gRule = "*";
-}
-function rule_division() {
-    gRule = "/";
+    set_display_font_size();
+    // document.getElementById("calculator_display").innerText = gOldNumber;
+    $("#calculator_display").text(gOldNumber);
 }
 
 function click_swap() {
+    console.log("["+arguments.callee.name+"]");
     if (gCurrentNumber === INVALID) {
         if (gOldNumber !== INVALID) {
-            gOldNumber = gOldNumber * (-1);
-            document.getElementById("td_display").innerHTML = gOldNumber;
+            gOldNumber *= (-1);
+            // document.getElementById("calculator_display").innerHTML = gOldNumber;
+            $("#calculator_display").text(gOldNumber);
         }
     }
     else {
-        gCurrentNumber = gCurrentNumber * (-1);
+        gCurrentNumber *= (-1);
         gBackup = gCurrentNumber;
-        document.getElementById("td_display").innerHTML = gCurrentNumber;
+        // document.getElementById("calculator_display").innerHTML = gCurrentNumber;
+        $("#calculator_display").text(gCurrentNumber);
     }
 }
 
 function click_percent() {
-    DEBUG();
+    console.log("["+arguments.callee.name+"]");
     if (gCurrentNumber === INVALID) 
     {
         if (gOldNumber !== INVALID) 
         {
-            gOldNumber = gOldNumber * (0.01);
-            document.getElementById("td_display").innerHTML = gOldNumber;
+            gOldNumber *= (0.01);
+            // document.getElementById("calculator_display").innerHTML = gOldNumber;
+            $("#calculator_display").text(gOldNumber);
         }
     }
     else 
     {
-        gCurrentNumber = gCurrentNumber * (0.01);
-        document.getElementById("td_display").innerHTML = gCurrentNumber;
+        gCurrentNumber *= (0.01);
+        // document.getElementById("calculator_display").innerHTML = gCurrentNumber;
+        $("#calculator_display").text(gCurrentNumber);
         let tmpStr = String(gCurrentNumber);
         let pointIndex = tmpStr.indexOf(".");
         console.log("tmpStr: " + tmpStr + ", pointIndex: " + pointIndex);
@@ -197,31 +171,37 @@ function click_percent() {
             gUnderDecimal += (strLen - pointIndex - 2);
             console.log("strLen: " + strLen + ", gUnderDecimal: " + gUnderDecimal);
             gUnderDecimalNonZero = gUnderDecimal;
-
-            DEBUG();
         }
     }
 }
 
 function all_clear() {
+    console.log("["+arguments.callee.name+"]");
     gSum = 0;
-    gUnderDecimal = 0;
-    gUnderDecimalNonZero = 0;
+
     gCurrentNumber = INVALID;
     gBackup = 0;
     gOldNumber = INVALID;
     gRule = INVALID;
-    document.getElementById("td_display").innerText = 0;
-    gPoint = false;
+    point_clear();
+
+    // document.getElementById("calculator_display").innerText = 0;
+    $("#calculator_display").text(0);
 
     // text 길이에 따른 text 크기 설정
-    document.getElementById("td_display").setAttribute("style", "font-size:46px;");
+    // document.getElementById("calculator_display").setAttribute("style", "font-size:46px;");
+    $("#calculator_display").attr("style", "font-size:46px;");
+}
 
-    DEBUG();
+function point_clear() {
+    gPoint = false;
+    gUnderDecimal = 0;
+    gUnderDecimalNonZero = 0;
 }
 
 function set_number(num) {
-    console.log("[set_number] num: " + num);
+    console.log("["+arguments.callee.name+"]");
+    console.log("num: " + num);
 
     if (gCurrentNumber === INVALID) {
         gCurrentNumber = 0;
@@ -230,7 +210,7 @@ function set_number(num) {
     // 리팩!strCurrentNumber
     let strCurrentNumber = "";
     if (gPoint === true) {
-        DEBUG();
+        debug();
         gUnderDecimal++;
         gCurrentNumber = gCurrentNumber + (num / Math.pow(10, gUnderDecimal));
         if (num === 0)
@@ -244,7 +224,6 @@ function set_number(num) {
                 strCurrentNumber = gCurrentNumber;
             }
 
-            // console.log("gCurrentNumber len: " + (gCurrentNumber + "").length + ", gUnderDecimal: " + gUnderDecimal + ", gUnderDecimalNonZero: " + gUnderDecimalNonZero);
             if (strCurrentNumber !== "0.")
             {
                 if (gUnderDecimal === 1)
@@ -274,48 +253,44 @@ function set_number(num) {
     }
     gBackup = gCurrentNumber;
 
+    set_display_font_size();
 
-    set_display_font_size(true);
-
-    console.log("!! gCurrentNumber: " + gCurrentNumber);
+    console.log("gCurrentNumber: " + gCurrentNumber);
     if (gPoint === true && num === 0)
     {
-        document.getElementById("td_display").innerText = strCurrentNumber;
+        // document.getElementById("calculator_display").innerText = strCurrentNumber;
+        $("#calculator_display").text(strCurrentNumber);
     }
     else
     {
-        document.getElementById("td_display").innerText = gCurrentNumber;
+        // document.getElementById("calculator_display").innerText = gCurrentNumber;
+        $("#calculator_display").text(gCurrentNumber);
     }
 }
 
-function set_display_font_size(bCheckCurrentOnly)
-{
-    let currentNumberLen = (gCurrentNumber + "").length;
-    let oldNumLen = (gOldNumber + "").length;
+function set_display_font_size(){
+    console.log("["+arguments.callee.name+"]");
     let numLen = 0;
-    if (bCheckCurrentOnly === true)
+    let currentNumLength = (gCurrentNumber + "").length;
+    let oldNumLength = (gOldNumber + "").length;
+    if (gCurrentNumber === INVALID)
     {
-        numLen = currentNumberLen;
+        numLen = oldNumLength;
     }
     else
     {
-        if (gOldNumber !== INVALID)
-        {
-            numLen = (currentNumberLen > oldNumLen) ? currentNumberLen : oldNumLen;
-        }
-        else
-        {
-            numLen = currentNumberLen;
-        }
+        numLen = (currentNumLength >= oldNumLength) ? currentNumLength : oldNumLength;
     }
-    
-    console.log("currentNumberLen: " + numLen);
+
     let px = 46;
     let baseLen = 8;
     if (numLen > baseLen + 11){
-        px = 18;
+        px = 17;
     }
     else if (numLen > baseLen + 10){
+        px = 19;
+    }
+    else if (numLen > baseLen + 9){
         px = 20;
     }
     else if (numLen > baseLen + 8){
@@ -346,26 +321,23 @@ function set_display_font_size(bCheckCurrentOnly)
         px = 46;
     }
 
-    document.getElementById("td_display").setAttribute("style", "font-size:" + px + "px;");
+    // document.getElementById("calculator_display").setAttribute("style", "font-size:" + px + "px;");
+    $("#calculator_display").attr("style", "font-size:" + px + "px;");
 }
 
 function click_point() {
+    console.log("["+arguments.callee.name+"]");
     if (gPoint === false) {
         if (gCurrentNumber === INVALID) {
-            document.getElementById("td_display").innerText = "0.";
+            // document.getElementById("calculator_display").innerText = "0.";
+            $("#calculator_display").text("0.");
         }
         else
         {
-            document.getElementById("td_display").innerText = gCurrentNumber + ".";
+            // document.getElementById("calculator_display").innerText = gCurrentNumber + ".";
+            $("#calculator_display").text(gCurrentNumber + ".");
         }
 
         gPoint = true;
-        DEBUG();
     }
-}
-
-// 브라우저 창 닫기 : 동작 안함
-function win_close() {
-    // window.open().close();
-    window.open("file:///Users/sonminsik/Desktop/PROGRAMMING/web-toy-project/web-app-3/calculator.html", "_self").close();
 }
