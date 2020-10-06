@@ -171,21 +171,18 @@ function click_percent()
     }
     else 
     {
-        gInputNumber *= (0.01);
+        gStrInputNumber = Number(gStrInputNumber) * (0.01); // NOTE: 문자열 연산의 치명적인 단점.
+        gStrInputNumber += "";
+        gInputNumber = Number(gStrInputNumber);
+
         // document.getElementById("calculator_display").innerHTML = gInputNumber;
         $("#calculator_display").text(gInputNumber);
-        let tmpStr = String(gInputNumber);
-        let pointIndex = tmpStr.indexOf(".");
-        console.log("tmpStr: " + tmpStr + ", pointIndex: " + pointIndex);
-        if (pointIndex !== -1)
-        {
-            let strLen = tmpStr.length;
-            gPoint = true;
-            gUnderDecimal += (strLen - pointIndex - 2);
-            console.log("strLen: " + strLen + ", gUnderDecimal: " + gUnderDecimal);
-            gUnderDecimalNonZero = gUnderDecimal;
-        }
+        gPoint = String(gInputNumber).includes(".");
     }
+
+    debug();
+
+    set_display_font_size();
 }
 
 function all_clear()
