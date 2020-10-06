@@ -6,23 +6,26 @@ INVALID = null;
 // null, undefined
 
 // TODO: oldnumber 를 알기 쉽게 변경, currentnumber 도 마찬가지. backup 도 왜 필요한지..
-let gSum = 0
 let gUnderDecimal = 0;
 let gUnderDecimalNonZero = 0;
-let gOldNumber = INVALID;
-let gCurrentNumber = INVALID;
-let gBackup = 0;
-let gRule = INVALID;
+let gCalculationResult = INVALID;
+let gInputNumber = INVALID;
+let gStrInputNumber = INVALID;
+let gBackupNumberForEqualOperation = 0;
+let gOperator = INVALID;
 let gPoint = false;
-let DEBUG = false;
-function debug() {
+
+let DEBUG = true;
+function debug()
+{
     if (DEBUG === true)
     {
-        console.log("["+arguments.callee.name+"] " + "gSum: " + gSum + ", gOldNumber: " + gOldNumber + ", gCurrentNumber: " + gCurrentNumber + ", gRule: " + gRule + ", gPoint: " + gPoint + ", gUnderDecimal: " + gUnderDecimal);
+        console.log("["+arguments.callee.name+"] " + ", gCalculationResult: " + gCalculationResult + ", gInputNumber: " + gInputNumber + ", gStrInputNumber: " + gStrInputNumber + ", gOperator: " + gOperator + ", gPoint: " + gPoint + ", gUnderDecimal: " + gUnderDecimal);
     }
 }
 
-function click_number(id) {
+function click_number(id)
+{
     console.log("["+arguments.callee.name+"]");
     console.log("id: " + id);
 
@@ -34,7 +37,8 @@ function click_number(id) {
     }
     else if (id >= 0 && id <= 9)
     {
-        if (gSum === 0) {
+        if ($("#all_clear").text() === "AC")
+        {
             // document.getElementById("all_clear").innerText = "C";
             $("#all_clear").text("C");
         }
@@ -46,122 +50,131 @@ function click_number(id) {
     }
 }
 
-function click_rules(id) {
+function click_operator(id)
+{
     console.log("["+arguments.callee.name+"]");
     debug();
 
     point_clear();
+
+    let firstClickOnOperator = (gOperator === INVALID) || (gCalculationResult === INVALID);
+    let performCalculation = false;
     
-    let doPostProcess = false;
-    if (gRule === INVALID) {
-
-        gOldNumber = gCurrentNumber;
-        gBackup = gCurrentNumber;
-        gCurrentNumber = INVALID;
+    // NOTE: 연산자를 최초로 클릭한 경우.
+    if (firstClickOnOperator === true)
+    {
+        gCalculationResult = gInputNumber;
+        gBackupNumberForEqualOperation = gInputNumber;
+        gInputNumber = INVALID;
     }
-    else {
-        if (gOldNumber !== 0 && gCurrentNumber !== INVALID) {
-            doPostProcess = true;
+    else
+    {
+        performCalculation = (gCalculationResult !== INVALID) && (gInputNumber !== INVALID);
+    }
+
+    let gPrevOperator = gOperator;
+    switch (id)
+    {
+        case "op_equal": op_equal(); break; // =
+        case "op_plus": gOperator = "+"; break; // +
+        case "op_substract": gOperator = "-"; break; // -
+        case "op_multiply": gOperator = "*"; break; // *
+        case "op_division": gOperator = "/"; break; // / 
+        default: console.warn("[ERROR] [click_gOperators]"); break;
+    }
+
+    let divideByZero = (gOperator === "/") && (gInputNumber === 0);
+
+    if (performCalculation === true)
+    {
+        if (id !== "op_equal")
+        {
+            let backupCurrentOperator = gOperator;
+            let operatorChanged = (gOperator !== gPrevOperator);
+            if (operatorChanged === true)
+            {
+                gOperator = gPrevOperator;
+            }
+
+            calculate(gInputNumber);
+
+            gBackupNumberForEqualOperation = gInputNumber;
+            // document.getElementById("calculator_display").innerText = gCalculationResult;
+            $("#calculator_display").text(gCalculationResult);
         }
-    }
 
-    let tmpRule = gRule;
-    switch (id) {
-        case "rule_equal": rule_equal(); break; // =
-        case "rule_plus": gRule = "+"; break; // +
-        case "rule_substract": gRule = "-"; break; // -
-        case "rule_multiply": gRule = "*"; break; // *
-        case "rule_division": gRule = "/"; break; // / 
-        default: console.warn("[ERROR] [click_gRules]"); break;
+        gInputNumber = INVALID;
     }
-
-    // TODO: refac
-    if (doPostProcess == true) {
-        if (id !== "rule_equal") {
-            let tmpRule2 = gRule;
-            if (gRule !== tmpRule) {
-                gRule = tmpRule;
-            }
-            if (gRule === "+") {
-                gOldNumber += gCurrentNumber;
-            }
-            else if (gRule === "-") {
-                gOldNumber -= gCurrentNumber;
-            }
-            else if (gRule === "*") {
-                gOldNumber *= gCurrentNumber;
-            }
-            else if (gRule === "/") {
-                gOldNumber /= gCurrentNumber;
-            }
-            gRule = tmpRule2;
-
-            gBackup = gCurrentNumber;
-            // document.getElementById("calculator_display").innerText = gOldNumber;
-            $("#calculator_display").text(gOldNumber);
-        }
-        gCurrentNumber = INVALID;
-    }
-    else {
-        if (gRule === "/") {
-            if (gCurrentNumber === 0) {
-                // document.getElementById("calculator_display").innerText = "숫자 아님";
-                $("#calculator_display").text("숫자 아님");
-            }
-        }
+    else if (divideByZero === true)
+    {
+        // document.getElementById("calculator_display").innerText = "숫자 아님";
+        $("#calculator_display").text("숫자 아님");
     }
 
     debug();
 }
-function rule_equal() {
+
+function calculate(inputNumber)
+{
     console.log("["+arguments.callee.name+"]");
-    switch (gRule) {
-        case "+": gOldNumber += gBackup; break;
-        case "-": gOldNumber -= gBackup; break;
-        case "*": gOldNumber *= gBackup; break;
-        case "/": gOldNumber /= gBackup; break;
+    switch (gOperator)
+    {
+        case "+": gCalculationResult += Number(inputNumber); break;
+        case "-": gCalculationResult -= Number(inputNumber); break;
+        case "*": gCalculationResult *= Number(inputNumber); break;
+        case "/": gCalculationResult /= Number(inputNumber); break;
         default: console.warn("["+arguments.callee.name+"] ERROR"); break;
     }
+}
+
+function op_equal()
+{
+    console.log("["+arguments.callee.name+"]");
+    calculate(gBackupNumberForEqualOperation);
 
     set_display_font_size();
-    // document.getElementById("calculator_display").innerText = gOldNumber;
-    $("#calculator_display").text(gOldNumber);
+    // document.getElementById("calculator_display").innerText = gCalculationResult;
+    $("#calculator_display").text(gCalculationResult);
 }
 
 function click_swap() {
     console.log("["+arguments.callee.name+"]");
-    if (gCurrentNumber === INVALID) {
-        if (gOldNumber !== INVALID) {
-            gOldNumber *= (-1);
-            // document.getElementById("calculator_display").innerHTML = gOldNumber;
-            $("#calculator_display").text(gOldNumber);
+    if (gInputNumber === INVALID)
+    {
+        if (gCalculationResult !== INVALID)
+        {
+            gCalculationResult *= (-1);
+            // document.getElementById("calculator_display").innerHTML = gCalculationResult;
+            $("#calculator_display").text(gCalculationResult);
         }
     }
-    else {
-        gCurrentNumber *= (-1);
-        gBackup = gCurrentNumber;
-        // document.getElementById("calculator_display").innerHTML = gCurrentNumber;
-        $("#calculator_display").text(gCurrentNumber);
+    else
+    {
+        gInputNumber *= (-1);
+        gBackupNumberForEqualOperation = gInputNumber;
+        // document.getElementById("calculator_display").innerHTML = gInputNumber;
+        $("#calculator_display").text(gInputNumber);
     }
 }
 
-function click_percent() {
+function click_percent()
+{
     console.log("["+arguments.callee.name+"]");
-    if (gCurrentNumber === INVALID) 
+    if (gInputNumber === INVALID) 
     {
-        if (gOldNumber !== INVALID) 
+        if (gCalculationResult !== INVALID) 
         {
-            gOldNumber *= (0.01);
-            // document.getElementById("calculator_display").innerHTML = gOldNumber;
-            $("#calculator_display").text(gOldNumber);
+            gCalculationResult *= (0.01);
+            // document.getElementById("calculator_display").innerHTML = gCalculationResult;
+            $("#calculator_display").text(gCalculationResult);
         }
     }
     else 
     {
-        gCurrentNumber *= (0.01);
-        // document.getElementById("calculator_display").innerHTML = gCurrentNumber;
-        $("#calculator_display").text(gCurrentNumber);
-        let tmpStr = String(gCurrentNumber);
+        gInputNumber *= (0.01);
+        // document.getElementById("calculator_display").innerHTML = gInputNumber;
+        $("#calculator_display").text(gInputNumber);
+        let tmpStr = String(gInputNumber);
         let pointIndex = tmpStr.indexOf(".");
         console.log("tmpStr: " + tmpStr + ", pointIndex: " + pointIndex);
         if (pointIndex !== -1)
@@ -175,14 +188,13 @@ function click_percent() {
     }
 }
 
-function all_clear() {
+function all_clear()
+{
     console.log("["+arguments.callee.name+"]");
-    gSum = 0;
-
-    gCurrentNumber = INVALID;
-    gBackup = 0;
-    gOldNumber = INVALID;
-    gRule = INVALID;
+    gInputNumber = INVALID;
+    gBackupNumberForEqualOperation = 0;
+    gCalculationResult = INVALID;
+    gOperator = INVALID;
     point_clear();
 
     // document.getElementById("calculator_display").innerText = 0;
@@ -193,93 +205,56 @@ function all_clear() {
     $("#calculator_display").attr("style", "font-size:46px;");
 }
 
-function point_clear() {
+function point_clear()
+{
     gPoint = false;
     gUnderDecimal = 0;
     gUnderDecimalNonZero = 0;
 }
 
-function set_number(num) {
+function set_number(num)
+{
     console.log("["+arguments.callee.name+"]");
     console.log("num: " + num);
 
-    if (gCurrentNumber === INVALID) {
-        gCurrentNumber = 0;
+    if (gInputNumber === INVALID) 
+    {
+        gInputNumber = 0;
+        gStrInputNumber = "";
     }
-    // caculator
-    // 리팩!strCurrentNumber
-    let strCurrentNumber = "";
-    if (gPoint === true) {
-        debug();
-        gUnderDecimal++;
-        gCurrentNumber = gCurrentNumber + (num / Math.pow(10, gUnderDecimal));
-        if (num === 0)
-        {
-            if (gCurrentNumber === 0)
-            {
-                strCurrentNumber = "0.";
-            }
-            else
-            {
-                strCurrentNumber = gCurrentNumber;
-            }
 
-            if (strCurrentNumber !== "0.")
-            {
-                if (gUnderDecimal === 1)
-                {
-                    strCurrentNumber += ".";
-                }
-                else if(gUnderDecimalNonZero === 0)
-                {
-                    strCurrentNumber += ".";
-                }
-            }
+    gStrInputNumber += num;
 
-            for(let i = 0; i < (gUnderDecimal - gUnderDecimalNonZero); i++)
-            {
-                strCurrentNumber += "0";
-            }
-        }
-        else
-        {
-            
-            gUnderDecimalNonZero = gUnderDecimal;
-        }
-    }
-    else {
-        gCurrentNumber *= 10;
-        gCurrentNumber += num;
-    }
-    gBackup = gCurrentNumber;
+    debug();
+    gInputNumber = Number(gStrInputNumber)
+    debug();
+    
+    $("#calculator_display").text(gStrInputNumber);
+    gBackupNumberForEqualOperation = gInputNumber;
 
     set_display_font_size();
-
-    console.log("gCurrentNumber: " + gCurrentNumber);
-    if (gPoint === true && num === 0)
-    {
-        // document.getElementById("calculator_display").innerText = strCurrentNumber;
-        $("#calculator_display").text(strCurrentNumber);
-    }
-    else
-    {
-        // document.getElementById("calculator_display").innerText = gCurrentNumber;
-        $("#calculator_display").text(gCurrentNumber);
-    }
 }
 
 function set_display_font_size(){
     console.log("["+arguments.callee.name+"]");
     let numLen = 0;
-    let currentNumLength = (gCurrentNumber + "").length;
-    let oldNumLength = (gOldNumber + "").length;
-    if (gCurrentNumber === INVALID)
+    let currentNumLength = (gInputNumber + "").length;
+    let oldNumLength = (gCalculationResult + "").length;
+    console.log("gInputNumber: " + gInputNumber);
+    if (gInputNumber === INVALID)
     {
         numLen = oldNumLength;
     }
     else
     {
-        numLen = (currentNumLength >= oldNumLength) ? currentNumLength : oldNumLength;
+        if (gCalculationResult === INVALID)
+        {
+            numLen = currentNumLength;
+        }
+        else
+        {
+            numLen = (currentNumLength >= oldNumLength) ? currentNumLength : oldNumLength;
+        }
     }
 
     let px = 46;
@@ -325,17 +300,24 @@ function set_display_font_size(){
     $("#calculator_display").attr("style", "font-size:" + px + "px;");
 }
 
-function click_point() {
+function click_point()
+{
     console.log("["+arguments.callee.name+"]");
-    if (gPoint === false) {
-        if (gCurrentNumber === INVALID) {
+    if (gPoint === false)
+    {
+        if (gInputNumber === INVALID)
+        {
             // document.getElementById("calculator_display").innerText = "0.";
             $("#calculator_display").text("0.");
+            gStrInputNumber += "0.";
+            console.log("gStrInputNumber: " + gStrInputNumber);
         }
         else
         {
-            // document.getElementById("calculator_display").innerText = gCurrentNumber + ".";
-            $("#calculator_display").text(gCurrentNumber + ".");
+            // document.getElementById("calculator_display").innerText = gInputNumber + ".";
+            $("#calculator_display").text(gInputNumber + ".");
+            gStrInputNumber += ".";
+            console.log("gStrInputNumber: " + gStrInputNumber);
         }
 
         gPoint = true;
