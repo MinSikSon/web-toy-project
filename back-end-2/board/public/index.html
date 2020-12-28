@@ -1,0 +1,81 @@
+<!doctype html>
+<html>
+<head>
+    <title>CHAT!</title>
+    <meta charset="utf-8">
+    <style>
+        body{
+            color:greenyellow;
+            font-size: 24px;
+            position: relative;
+            z-index: 1;
+        }
+        body::after{
+            width: 100%;
+            height: 100%;
+            content: "";
+            background-image: url('images/background_2.png');
+            background-size: cover;
+            position: absolute;
+            top:0;
+            left:0;
+            z-index: -1;
+            opacity: 0.6;
+        }
+        input{
+            background-color:transparent;
+        }
+        textarea{
+            background-color:transparent;
+            width: 100%;
+        }
+    </style>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <h1><a href="/">🎾 게시판🎾</a></h1>
+
+
+    
+    <h3>🐷 글 목록 🐷</h3>
+    <table class='table table-hover'>
+        <thead>
+
+            <tr>
+                <th>제목</th>
+                <th>작성자</th>
+                <th>날짜</th>
+            </tr>
+        </thead>
+        <tbody id='content_list'>
+
+        </tbody>
+        <tfoot>
+            <tr>
+                <th><button id='post_content'>[post] 글 등록</button></th>
+                <th><button id='put_content'>[put] 글 수정</button></th>
+                <th><button id='delete_content'>[delete] 글 제거</button></th>
+            </tr>
+        </tfoot>
+    </table>
+
+    <h3>🏛 글 생성 및 조회 🏛</h3>
+    <table class='table'>
+        <tbody>
+            <tr></tr>
+            <tr>
+                <td><input id='title' placeholder="title"></td>
+                <td><input id='user' placeholder="user"></td>
+                <td><input type='password' id='pw' placeholder="pw"></td>
+            </tr>
+        </tbody>
+    </table>
+    <textarea id='content' placeholder="content" cols="67" rows="10"></textarea>
+    
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script type="text/javascript" src="javascript/index.js"></script>
+</body>
+</html>

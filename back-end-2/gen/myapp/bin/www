@@ -1,0 +1,191 @@
+#!/usr/bin/env node
+
+/**
+ * Module dependencies.
+ */
+
+var app = require('../app');
+var debug = require('debug')('myapp:server');
+var http = require('http');
+const { on } = require('process');
+
+// user id
+var userList = new Map();
+var clientCount = 0;
+/**
+ * Get port from environment and store in Express.
+ */
+
+var port = normalizePort(process.env.PORT || '3000');
+app.set('port', port);
+
+/**
+ * Create HTTP server.
+ */
+
+var server = http.createServer(app);
+
+// io
+var io = require('socket.io')(server);
+
+io.on('connection', (socket) => {
+  console.log('a user connected (' + socket.handshake.address + ')');
+  var address = socket.handshake.address;
+
+  // default name
+  if (userList.get(address) === undefined)
+  {
+    console.log('[userList]');
+    for (var [key, value] of userList)
+    {
+      console.log('  key (' + key + '), value (' + value + ')');
+    }
+
+    console.log('address: ' + address + ', ' + userList.get(address));
+
+    if (address === "::1")
+    {
+      console.log("set userList: server")
+      userList.set(address, "server");
+    }
+    else
+    {
+      console.log("set userList: client_"+String(clientCount));
+      userList.set(address, "client_"+String(clientCount++));
+    }
+
+    // print user list
+
+  }
+  socket.broadcast.emit('hi'); // broadcast except me!!
+  // io.emit('chat message', '^^ \"' + address + '['+userList.get(address)+']\"가 입장했습니다.');
+  socket.on('disconnect', () => {
+    console.log('user disconnected');
+    var userName = userList.get(address);
+    // userList.delete(address);
+    io.emit('chat message', userName + '님이 퇴장하셨습니다. (' + userList.size + '명)');
+  });
+
+  socket.on('chat message', (msg) => {
+    var chars = msg.split(' ');
+    console.log(chars);
+    if (chars[0] === '!주식' || chars[0] === '!주가')
+    {
+      if (chars[1] === '삼성전자')
+      {
+        printPrice(chars[1], '73,800 원');
+      }
+      else if (chars[1] === '하이닉스')
+      {
+        printPrice(chars[1], '117,500 원');
+      }
+      else
+      {
+        console.log(address + '님, 현재 해당 종목 조회 불가합니다.');
+        io.to(socket.id).emit('chat message', address + '님, 현재 해당 종목 조회 불가합니다.');
+      }
+    }
+    else
+    {
+      if (msg != '')
+      {
+        console.log('message: ' + msg);
+        // io.emit('chat message', '[' + address + '] ' + msg);
+        io.emit('chat message', '[' + userList.get(address) + '] ' + msg);
+      }
+      else
+      {
+        console.log(address + '님 message 를 입력하세요.');
+        io.to(socket.id).emit('chat message', address + '님 message 를 입력하세요.');
+      }
+    }
+  })
+  socket.on('chat enter', (msg) =>{
+    io.emit('chat message', userList.get(address) + '님이 입장했습니다. (' + userList.size + '명)');
+  })
+  // console.log(socket);
+
+  socket.on('chat register', (msg) => {
+    console.log('chat register: ' + address + ', ' + msg);
+    userList.set(address, msg);
+
+    // DBG: print user list
+    console.log('[userList]');
+    for (var [key, value] of userList)
+    {
+      console.log('  key (' + key + '), value (' + value + ')');
+    }
+  });
+})
+
+function printPrice(stockName, stockPrice)
+{
+  io.emit('chat message', '*** ' + stockName + ' 주가는 ' + stockPrice + ' 입니다 ***');
+}
+/**
+ * Listen on provided port, on all network interfaces.
+ */
+
+server.listen(port);
+server.on('error', onError);
+server.on('listening', onListening);
+
+/**
+ * Normalize a port into a number, string, or false.
+ */
+
+function normalizePort(val) {
+  var port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
+
+  if (port >= 0) {
+    // port number
+    return port;
+  }
+
+  return false;
+}
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function onError(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  var bind = typeof port === 'string'
+    ? 'Pipe ' + port
+    : 'Port ' + port;
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+
+function onListening() {
+  var addr = server.address();
+  var bind = typeof addr === 'string'
+    ? 'pipe ' + addr
+    : 'port ' + addr.port;
+  debug('Listening on ' + bind);
+}

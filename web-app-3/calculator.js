@@ -6,8 +6,6 @@ INVALID = null;
 // null, undefined
 
 // TODO: oldnumber 를 알기 쉽게 변경, currentnumber 도 마찬가지. backup 도 왜 필요한지..
-let gUnderDecimal = 0;
-let gUnderDecimalNonZero = 0;
 let gCalculationResult = INVALID;
 let gInputNumber = INVALID;
 let gStrInputNumber = INVALID;
@@ -16,17 +14,18 @@ let gOperator = INVALID;
 let gPoint = false;
 
 let DEBUG = true;
-function debug()
+function debug(name)
 {
     if (DEBUG === true)
     {
-        console.log("["+arguments.callee.name+"] " + ", gCalculationResult: " + gCalculationResult + ", gInputNumber: " + gInputNumber + ", gStrInputNumber: " + gStrInputNumber + ", gOperator: " + gOperator + ", gPoint: " + gPoint + ", gUnderDecimal: " + gUnderDecimal);
+        console.log("["+name+"] " + ", gCalculationResult: " + gCalculationResult + ", gInputNumber: " + gInputNumber + ", gStrInputNumber: " + gStrInputNumber + ", gOperator: " + gOperator + ", gPoint: " + gPoint);
     }
 }
 
+// $("#idid").on()
 function click_number(id)
 {
-    console.log("["+arguments.callee.name+"]");
+    debug(arguments.callee.name)
     console.log("id: " + id);
 
     if (id === "all_clear")
@@ -35,7 +34,7 @@ function click_number(id)
         // document.getElementById("all_clear").innerText = "AC";
         jQuery("#all_clear").text("AC");
     }
-    else if (id >= 0 && id <= 9)
+    else if (Number(id) >= 0 && id <= 9) // !
     {
         if ($("#all_clear").text() === "AC")
         {
@@ -205,8 +204,6 @@ function all_clear()
 function point_clear()
 {
     gPoint = false;
-    gUnderDecimal = 0;
-    gUnderDecimalNonZero = 0;
 }
 
 function set_number(num)
