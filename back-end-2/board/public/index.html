@@ -38,7 +38,25 @@
 <body>
     <h1><a href="/">🎾 게시판🎾</a></h1>
 
-
+    <h3>🏛 글 생성 및 조회 🏛</h3>
+    <table class='table'>
+        <thead>
+            <tr>
+                <th><button id='post_content'>[post] 글 등록</button></th>
+                <th><button id='put_content'>[put] 글 수정</button></th>
+                <th><button id='delete_content'>[delete] 글 제거</button></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr></tr>
+            <tr>
+                <td><input id='title' placeholder="title"></td>
+                <td><input id='user' placeholder="user"></td>
+                <td><input type='password' id='pw' placeholder="pw"></td>
+            </tr>
+        </tbody>
+    </table>
+    <textarea id='content' placeholder="content" cols="67" rows="10"></textarea>
     
     <h3>🐷 글 목록 🐷</h3>
     <table class='table table-hover'>
@@ -53,27 +71,10 @@
         <tbody id='content_list'>
 
         </tbody>
-        <tfoot>
-            <tr>
-                <th><button id='post_content'>[post] 글 등록</button></th>
-                <th><button id='put_content'>[put] 글 수정</button></th>
-                <th><button id='delete_content'>[delete] 글 제거</button></th>
-            </tr>
-        </tfoot>
+
     </table>
 
-    <h3>🏛 글 생성 및 조회 🏛</h3>
-    <table class='table'>
-        <tbody>
-            <tr></tr>
-            <tr>
-                <td><input id='title' placeholder="title"></td>
-                <td><input id='user' placeholder="user"></td>
-                <td><input type='password' id='pw' placeholder="pw"></td>
-            </tr>
-        </tbody>
-    </table>
-    <textarea id='content' placeholder="content" cols="67" rows="10"></textarea>
+
     
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script type="text/javascript" src="javascript/index.js"></script>
