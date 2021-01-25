@@ -7,14 +7,8 @@ var template = require('../lib/template');
 /* GET home page. */
 
 router.get('/', function(req, res, next){
-  var title = `
-    main
-  `;
-  var body = `
-    <li>
-    </li>
-  `;
-  res.send(template.HTML('',title,body,''));
+
+  // res.sendFile('../public/index.html')
   // next();
 });
 

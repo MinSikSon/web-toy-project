@@ -1,3 +1,5 @@
+var partialLoadLock = false;
+
 rebuild_list();
 
 $('#user').val('');
@@ -6,8 +8,12 @@ $('#pw').val('');
 var selected_id = null;
 var hellodata = {
     title : 'title',
-    content: 'content'
+    content: 'content',
+    // user: 'user',
+    // pw: 'pw'
 };
+
+var listLength = 0;
 
 function get_json_form()
 {
@@ -22,42 +28,12 @@ function get_json_form()
     };
 }
 
-function set_json_userInfo(user, pw, warn)
+function set_json_userInfo(user, pw)
 {
-    var ret = false;
-    if (user != undefined && user.length === 0)
-    {
-        if (warn === true) alert("user 란 비었음.");
-        ret = false;
-    }
-    else if(pw != undefined && pw.length === 0)
-    {
-        if (warn === true) alert("pw 란 비었음.");
-        ret = false;
-    }
-    else
-    {
-        if (user === undefined)
-        {
-            hellodata.user = '';
-        }
-        else
-        {
-            hellodata.user = user;
-        }
-        if (pw === undefined)
-        {
-            hellodata.pw = '';
-        }
-        else
-        {
-            hellodata.pw = pw;
-        }
-        console.log('this: ' + hellodata);
-        ret = true;
-    }
-
-    return ret;
+    // console.log(arguments.callee.name)
+    // console.log('user: ' + user + ', pw: ' + pw);
+    hellodata.user = user;
+    hellodata.pw = pw;
 }
 
 function init_json_userInfo()
@@ -110,32 +86,28 @@ function init_html_content()
 $('#post_content').click(function(e){
     e.preventDefault();
 
-    var ret = set_json_userInfo($('#user').val(), $('#pw').val(), true);
+    set_json_userInfo($('#user').val(), $('#pw').val());
+    set_json_content($('#title').val(), $('#content').val());
 
-    if (ret === true)
-    {
-        set_json_content($('#title').val(), $('#content').val());
-
-        $.ajax({
-            url : "http://localhost:3000/content",
-            type: "POST",
-            data : get_json_form(),
-            success: function(data, textStatus, jqXHR)
-            {
-                console.log(data);
-                rebuild_list();
-                init_html_userInfo();
-                init_html_content();
-                //console.log(data);
-                //data - response from server
-                //$('#content_list').append("<li>" + data.content + "</li>")
-            },
-            error: function (jqXHR, textStatus, errorThrown)
-            {
-                console.log("post fail");
-            }
-        });
-    }
+    $.ajax({
+        url : "http://localhost:3000/content",
+        type: "POST",
+        data : get_json_form(),
+        success: function(data, textStatus, jqXHR)
+        {
+            // console.log(data);
+            rebuild_list();
+            loadLatestContent();
+            init_html_userInfo();
+            init_html_content();
+            //data - response from server
+            //$('#content_list').append("<li>" + data.content + "</li>")
+        },
+        error: function (jqXHR, textStatus, errorThrown)
+        {
+            identifyAlert(jqXHR.status);
+        }
+    });
 });  
 
 function rebuild_list()
@@ -150,8 +122,11 @@ function rebuild_list()
             // console.log("get");
             // console.log(data.body);
             var json = JSON.parse(data.body);
+            console.log(json);
+            console.log(json.length);
             // console.log(json);
             $('#content_list').empty();
+            // for (var i = json.length - 1; i >= 0 ; i--)
             for (var i = 0; i < json.length; i++)
             {
                 $('#content_list').append(`<tr class='content_title' id=${json[i].id}><td>${json[i].title}</td><td>${json[i].user}</td><td>${json[i].date}</td></tr>`);
@@ -166,6 +141,14 @@ function rebuild_list()
         }
     });
 }
+
+// post 이후 call
+function loadLatestContent()
+{
+
+}
+
+
 // page 처음 시작 시 로딩
 $('#get_content').click(function(e){
     e.preventDefault();
@@ -182,23 +165,21 @@ function build_lookup_table()
         e.preventDefault();
 
         selected_id = $(this).attr('id');
-        console.log('id: ' + selected_id);
+        // console.log('id: ' + selected_id);
         $.ajax({
             url : `http://localhost:3000/content/${selected_id}`,
             type: "GET",
             success: function(data, textStatus, jqXHR)
             {
-                console.log("get");
-                console.log(data);
+                // console.log("GET (" + jqXHR.status + "): " + data);
                 var json = JSON.parse(data);
-                console.log('user: ' + json.user);
-                set_json_userInfo(json.user, '', false);
+                set_json_userInfo(json.user, '');
                 set_html_userInfo(json.user, '');
                 set_html_content(json.title, json.content);
             },
             error: function (jqXHR, textStatus, errorThrown)
             {
-                console.log("get fail");
+                identifyAlert(jqXHR.status);
             }
         });
     });
@@ -209,7 +190,7 @@ function build_lookup_table()
 $('#put_content').click(function(e){
     e.preventDefault();
 
-    set_json_userInfo($('#user').val(), $('#pw').val(), true);
+    set_json_userInfo($('#user').val(), $('#pw').val());
     set_json_content($('#title').val(), $('#content').val());
     $.ajax({
         url : `http://localhost:3000/content/${selected_id}`,
@@ -217,15 +198,13 @@ $('#put_content').click(function(e){
         data : get_json_form(),
         success: function(data, textStatus, jqXHR)
         {
-            console.log("put");
-            console.log(data);
-            rebuild_list();
+            // rebuild_list();
             init_json_userInfo();
-            //data - response from server
+            identifyAlert(jqXHR.status, '수정 ');
         },
         error: function (jqXHR, textStatus, errorThrown)
         {
-            console.log("put fail");
+            identifyAlert(jqXHR.status);
         }
     });
 });
@@ -234,24 +213,106 @@ $('#put_content').click(function(e){
 $('#delete_content').click(function(e){
     e.preventDefault();
 
-    set_json_userInfo($('#user').val(), $('#pw').val(), false);
+    set_json_userInfo($('#user').val(), $('#pw').val());
     $.ajax({
         url : `http://localhost:3000/content/${selected_id}`,
         type: "DELETE",
         data : get_json_form(),
         success: function(data, textStatus, jqXHR)
         {
-            console.log("delete");
-            console.log(data);
+            // console.log(data);
             rebuild_list();
             init_html_userInfo();
             init_json_userInfo();
             init_html_content();
             //data - response from server
+            identifyAlert(jqXHR.status, '삭제 ');
         },
         error: function (jqXHR, textStatus, errorThrown)
         {
-            console.log("delete fail");
+            identifyAlert(jqXHR.status);
         }
     });
 });
+
+function identifyAlert(statusCode, msg)
+{
+    if (statusCode === 200)
+    {
+        alert(msg + '성공');
+    }
+    if (statusCode === 404)
+    {
+        alert('id 를 확인하세요.');
+    }
+    if (statusCode === 403)
+    {
+        alert('password 를 확인하세요.');
+    }
+}
+
+// scroll event
+$(document).ready(function(){
+    $(document).scroll(function(){
+        var height = $(document).height(); // 고정값
+        var scrollTop = $(window).scrollTop();
+        // var scrollBottom = $(window).scrollBottom();
+        var reload = scrollTop + 706;
+        // console.log('height: ' + height);
+        // console.log('scrollTop: ' + scrollTop);
+        // console.log('scrollTop: ' + scrollTop + ', scrollBottom: ' + scrollBottom);
+        // console.log('reload: ' + reload);
+        if (partialLoadLock === false && height <= reload)
+        {
+            partialLoadLock = false;
+            rebuild_paritalContents();
+        }
+    })
+})
+
+
+// scroll 움직이는 시점에 call
+function rebuild_paritalContents()
+{
+    console.log(arguments.callee.name);
+
+    var numOfLoadedContents = $('.content_title').length;
+    $.ajax({
+        url : `http://localhost:3000/content/loadpartialcontent/${numOfLoadedContents}`,
+        type: "GET",
+        success: function(data, textStatus, jqXHR)
+        {
+            var json = JSON.parse(data.body);
+            // console.log("get");
+            console.log(json);
+            for(var i = 0; i < json.length; i++)
+            {
+                console.log(json[i]);
+                $('#content_list').append(`<tr class='content_title' id=${json[i].id}><td>${json[i].title}</td><td>${json[i].user}</td><td>${json[i].date}</td></tr>`);
+            }
+            // var json = JSON.parse(data.body);
+            // console.log(json);
+            // console.log(json.length);
+            // // console.log(json);
+            // $('#content_list').empty();
+            // var startPage = json.length > 0 ? json.length - 1 : 0;
+            // var loadPageLimit = json.length > 5 ? 5 : json.length;
+            // console.log(startPage);
+            // console.log(loadPageLimit);
+            // // for (var i = json.length - 1; i >= 0 ; i--)
+            // for (var i = startPage; i > startPage - loadPageLimit; i--)
+            // {
+            //     $('#content_list').append(`<tr class='content_title' id=${json[i].id}><td>${json[i].title}</td><td>${json[i].user}</td><td>${json[i].date}</td></tr>`);
+            // }
+            //data - response from server
+
+            build_lookup_table();
+
+            partialLoadLock = false;
+        },
+        error: function (jqXHR, textStatus, errorThrown)
+        {
+            identifyAlert(jqXHR.status);
+        }
+    });
+}
