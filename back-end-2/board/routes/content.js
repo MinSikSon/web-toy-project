@@ -24,6 +24,43 @@ var db = new mysql({
 
 var gid = boardData.contents.length;
 
+function createResponseContentArray(results)
+  {
+    var nNumContent = results.length;
+    var nLoopStart = nNumContent - 1;
+    var nLoopEnd = Number(nNumContent) > 5 ? Number(nNumContent) - 5 : 0;
+    console.log('nLoopStart: ' + nLoopStart + ', nLoopEnd: ' + nLoopEnd);
+    var contents = [];
+    console.log(results.length);
+    // console.log(results[0]);
+    // console.log(results);
+    for (var i = nLoopStart; i >= nLoopEnd; i--)
+    {
+      var content = {
+        'id': results[i].id,
+        'title': results[i].title,
+        'content': results[i].description,
+        'user': results[i].author_id,
+        'date': results[i].created
+      };
+      contents.push(content);
+    }
+
+    // console.log(contents);
+
+    const response = {
+      statusCode: 200,
+      headers: {
+          "Access-Control-Allow-Headers" : "Content-Type",
+          "Access-Control-Allow-Origin": "https://www.example.com",
+          "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+      },
+      body: JSON.stringify(contents),
+    };
+
+    return response
+  }
+
 /* GET home page. */
 router.get('/', function(req, res, next){
   console.log('contents get');
@@ -45,38 +82,7 @@ router.get('/', function(req, res, next){
     }
     else
     {
-      var nNumContent = results.length;
-      var nLoopStart = nNumContent - 1;
-      var nLoopEnd = Number(nNumContent) > 5 ? Number(nNumContent) - 5 : 0;
-      console.log('nLoopStart: ' + nLoopStart + ', nLoopEnd: ' + nLoopEnd);
-      var contents = [];
-      console.log(results.length);
-      // console.log(results[0]);
-      // console.log(results);
-      for (var i = nLoopStart; i >= nLoopEnd; i--)
-      {
-        var content = {
-          'id': results[i].id,
-          'title': results[i].title,
-          'content': results[i].description,
-          'user': results[i].author_id,
-          'date': results[i].created
-        };
-        contents.push(content);
-      }
-
-      // console.log(contents);
-
-      const response = {
-        statusCode: 200,
-        headers: {
-            "Access-Control-Allow-Headers" : "Content-Type",
-            "Access-Control-Allow-Origin": "https://www.example.com",
-            "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-        },
-        body: JSON.stringify(contents),
-      };
-
+      var response = createResponseContentArray(results);
       res.send(response);
     }
   });
@@ -130,7 +136,75 @@ router.get('/loadpartialcontent/:numOfLoadedContents', function(req, res, next){
     
     if (err) {
       console.log(err);
-      res.send(403);
+      res.sendStatus(403);
+    }
+    else {
+      var nNumContent = results.length;
+      var numOfLoadedContents = req.params.numOfLoadedContents;
+      var nLoopStart = nNumContent - numOfLoadedContents - 1;
+      var nLoopEnd = (Number(nNumContent) >= (Number(numOfLoadedContents) + 5)) ? (Number(nNumContent) - Number(numOfLoadedContents) - 5) : 0;
+      console.log('nLoopStart: ' + nLoopStart + ', nLoopEnd: ' + nLoopEnd);
+      var contents = [];
+      console.log(results.length);
+      // console.log(results[0]);
+      // console.log(results);
+      for (var i = nLoopStart; i >= nLoopEnd; i--) {
+        var content = {
+          'id': results[i].id,
+          'title': results[i].title,
+          'content': results[i].description,
+          'user': results[i].author_id,
+          'date': results[i].created
+        };
+        contents.push(content);
+      }
+
+      console.log(contents);
+
+      const response = {
+        statusCode: 200,
+        headers: {
+          "Access-Control-Allow-Headers": "Content-Type",
+          "Access-Control-Allow-Origin": "https://www.example.com",
+          "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+        },
+        body: JSON.stringify(contents),
+      };
+
+      res.send(response);
+    }
+  });
+  // console.log('loadpage');
+  // var nNumContent = boardData.contents.length;
+  // var numOfLoadedContents = req.params.numOfLoadedContents;
+  // console.log('nNumContent: ' + nNumContent + ', numOfLoadedContents: ' + numOfLoadedContents);
+  // var nLoopStart = nNumContent - numOfLoadedContents;
+  // var nLoopEnd = (Number(nNumContent) >= (Number(numOfLoadedContents) + 5)) ? (Number(nNumContent) - Number(numOfLoadedContents) - 5) : 0;
+  // console.log('nLoopStart: ' + nLoopStart + ', nLoopEnd: ' + nLoopEnd);
+  // var contents = [];
+  // for (var i = nLoopStart; i > nLoopEnd; i--)
+  // {
+  //   var content = {
+  //     'id': boardData.contents[i].id,
+  //     'title': boardData.contents[i].title,
+  //     'content': boardData.contents[i].content,
+  //     'user': boardData.contents[i].user,
+  //     'date': boardData.contents[i].date
+  //   };
+  //   contents.push(content);
+  // }
+  // console.log('contents.length: ' + contents.length);
+  // res.send(contents);
+});
+
+router.get('/loadpartialcontent/:numOfLoadedContents/keyword/:keyWord', function(req, res, next){
+  console.log(req.params);
+  var nKeyWord = req.params.keyWord;
+  console.log("keyword: " + nKeyWord);
+  db_async.query(`SELECT * from topic WHERE (title LIKE '%${nKeyWord}%' OR description LIKE '%${nKeyWord}%')`, function(error, results, fields){
+    if (error) {
+      console.log(error);
+      res.sendStatus(403);
     }
     else {
       var nNumContent = results.length;
@@ -293,7 +367,7 @@ router.get('/:contentId', function(req, res, next){
     if (error)
     {
       console.log(error);
-      res.send(403);
+      res.sendStatus(403);
     }
     else
     {
@@ -341,7 +415,7 @@ router.put('/:contentId', function(req, res, next){
     }
     else
     {
-      res.send(200);
+      res.sendStatus(200);
     }
   })
 
@@ -391,13 +465,13 @@ router.delete('/:contentId', function(req, res, next) {
     if (error)
     {
       console.log(error);
-      res.send(403);
+      res.sendStatus(403);
       
     }
     else
     {
       console.log('delete complete');
-      res.send(200);
+      res.sendStatus(200);
     }
   });
   // console.log('delete');
@@ -422,6 +496,28 @@ router.delete('/:contentId', function(req, res, next) {
  
 });
 
+router.get('/search/:keyWord', function(req, res, next)
+{
+  var nKeyWord = req.params.keyWord;
+  console.log(nKeyWord);
+  // nKeyWord를 포함하는 데이터 긁어와야 함..!
+  db_async.query(`SELECT * from topic WHERE (title LIKE '%${nKeyWord}%' OR description LIKE '%${nKeyWord}%')`, function(error, results){
+    if (error)
+    {
+      console.log(error);
+      res.sendStatus(403);
+    }
+    else
+    {
+      console.log(results);
+      console.log("!!!!!!!!!!!!!!!");
+      var response = createResponseContentArray(results);
+      // res.send(response);
+      console.log(response);
+      res.send(response);
+    }
+  })
+});
 
 
 module.exports = router;

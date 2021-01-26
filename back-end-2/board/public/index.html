@@ -15,13 +15,13 @@
             width: 100%;
             height: 100%;
             content: "";
-            background-color: royalblue;
-            background-size: cover;
+            background-image: url('images/south-station-4927286_1920.jpg');
+            background-size: contain;
             position: absolute;
             top:0;
             left:0;
             z-index: -1;
-            opacity: 0.6;
+            opacity: 0.3;
         }
         input{
             background-color:transparent;
@@ -59,7 +59,7 @@
     </table>
     <textarea id='content' placeholder="content" cols="67" rows="10"></textarea>
     
-    <h3>🐷 글 목록 🐷</h3>
+    <h3>🐷 글 목록 🐷</h3> <input id='search' placeholder="검색어"><button id='search_btn'>찾기</button>
     <table class='table table-hover'>
         <thead>
             <tr>
