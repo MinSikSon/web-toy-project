@@ -1,4 +1,5 @@
 var partialLoadLock = false;
+var search_keyword = "";
 
 rebuild_list();
 
@@ -112,6 +113,7 @@ $('#post_content').click(function(e){
 
 function rebuild_list()
 {
+
     console.log(arguments.callee.name);
 
     $.ajax({
@@ -276,43 +278,114 @@ function rebuild_paritalContents()
 {
     console.log(arguments.callee.name);
 
-    var numOfLoadedContents = $('.content_title').length;
-    $.ajax({
-        url : `http://localhost:3000/content/loadpartialcontent/${numOfLoadedContents}`,
-        type: "GET",
-        success: function(data, textStatus, jqXHR)
-        {
-            var json = JSON.parse(data.body);
-            // console.log("get");
-            console.log(json);
-            for(var i = 0; i < json.length; i++)
+    if (search_keyword == "")
+    {
+        var numOfLoadedContents = $('.content_title').length;
+        $.ajax({
+            url : `http://localhost:3000/content/loadpartialcontent/${numOfLoadedContents}`,
+            type: "GET",
+            success: function(data, textStatus, jqXHR)
             {
-                console.log(json[i]);
-                $('#content_list').append(`<tr class='content_title' id=${json[i].id}><td>${json[i].title}</td><td>${json[i].user}</td><td>${json[i].date}</td></tr>`);
+                var json = JSON.parse(data.body);
+                // console.log("get");
+                console.log(json);
+                for(var i = 0; i < json.length; i++)
+                {
+                    console.log(json[i]);
+                    $('#content_list').append(`<tr class='content_title' id=${json[i].id}><td>${json[i].title}</td><td>${json[i].user}</td><td>${json[i].date}</td></tr>`);
+                }
+                // var json = JSON.parse(data.body);
+                // console.log(json);
+                // console.log(json.length);
+                // // console.log(json);
+                // $('#content_list').empty();
+                // var startPage = json.length > 0 ? json.length - 1 : 0;
+                // var loadPageLimit = json.length > 5 ? 5 : json.length;
+                // console.log(startPage);
+                // console.log(loadPageLimit);
+                // // for (var i = json.length - 1; i >= 0 ; i--)
+                // for (var i = startPage; i > startPage - loadPageLimit; i--)
+                // {
+                //     $('#content_list').append(`<tr class='content_title' id=${json[i].id}><td>${json[i].title}</td><td>${json[i].user}</td><td>${json[i].date}</td></tr>`);
+                // }
+                //data - response from server
+    
+                build_lookup_table();
+    
+                partialLoadLock = false;
+            },
+            error: function (jqXHR, textStatus, errorThrown)
+            {
+                identifyAlert(jqXHR.status);
             }
-            // var json = JSON.parse(data.body);
-            // console.log(json);
-            // console.log(json.length);
-            // // console.log(json);
-            // $('#content_list').empty();
-            // var startPage = json.length > 0 ? json.length - 1 : 0;
-            // var loadPageLimit = json.length > 5 ? 5 : json.length;
-            // console.log(startPage);
-            // console.log(loadPageLimit);
-            // // for (var i = json.length - 1; i >= 0 ; i--)
-            // for (var i = startPage; i > startPage - loadPageLimit; i--)
-            // {
-            //     $('#content_list').append(`<tr class='content_title' id=${json[i].id}><td>${json[i].title}</td><td>${json[i].user}</td><td>${json[i].date}</td></tr>`);
-            // }
-            //data - response from server
-
-            build_lookup_table();
-
-            partialLoadLock = false;
-        },
-        error: function (jqXHR, textStatus, errorThrown)
-        {
-            identifyAlert(jqXHR.status);
-        }
-    });
+        });
+    }
+    else
+    {
+        var numOfLoadedContents = $('.content_title').length;
+        $.ajax({
+            url : `http://localhost:3000/content/loadpartialcontent/${numOfLoadedContents}/keyword/${search_keyword}`,
+            type: "GET",
+            success: function(data, textStatus, jqXHR)
+            {
+                var json = JSON.parse(data.body);
+                // console.log("get");
+                console.log(json);
+                for(var i = 0; i < json.length; i++)
+                {
+                    console.log(json[i]);
+                    $('#content_list').append(`<tr class='content_title' id=${json[i].id}><td>${json[i].title}</td><td>${json[i].user}</td><td>${json[i].date}</td></tr>`);
+                }
+    
+                build_lookup_table();
+    
+                partialLoadLock = false;
+            },
+            error: function (jqXHR, textStatus, errorThrown)
+            {
+                identifyAlert(jqXHR.status);
+            }
+        });
+    }
+    
 }
+
+
+$('#search_btn').click(function(e){
+    search_keyword = $('#search').val();
+    console.log(search_keyword);
+    if (search_keyword == "")
+    {
+        rebuild_list();
+    }
+    else
+    {
+        $.ajax({
+            url:`http://localhost:3000/content/search/${search_keyword}`,
+            type:"GET",
+            success: function(data, textStatus, jqXHR)
+            {
+                console.log("data: " + data);
+                var json = JSON.parse(data.body);
+                console.log("json: " + json);
+                // console.log(json.length);
+    
+                $('#content_list').empty();
+                // for (var i = json.length - 1; i >= 0 ; i--)
+                for (var i = 0; i < json.length; i++)
+                {
+                    $('#content_list').append(`<tr class='content_title' id=${json[i].id}><td>${json[i].title}</td><td>${json[i].user}</td><td>${json[i].date}</td></tr>`);
+                }
+
+                build_lookup_table();
+            },
+            error: function(jqXHR, textStatus, errorThrown)
+            {
+                console.log(jqXHR.status);
+                // identifyAlert(jqXHR.status);
+            }
+    
+    
+        });
+    }
+})
