@@ -54,7 +54,7 @@ function set_json_content(title, content)
         hellodata.content = content;
     }
 
-    console.log(hellodata);
+    // console.log(hellodata);
 }
 
 
@@ -113,7 +113,6 @@ $('#post_content').click(function(e){
 
 function rebuild_list()
 {
-
     console.log(arguments.callee.name);
 
     $.ajax({
@@ -124,8 +123,8 @@ function rebuild_list()
             // console.log("get");
             // console.log(data.body);
             var json = JSON.parse(data.body);
-            console.log(json);
-            console.log(json.length);
+            // console.log(json);
+            // console.log(json.length);
             // console.log(json);
             $('#content_list').empty();
             // for (var i = json.length - 1; i >= 0 ; i--)
@@ -260,10 +259,9 @@ $(document).ready(function(){
         var scrollTop = $(window).scrollTop();
         // var scrollBottom = $(window).scrollBottom();
         var reload = scrollTop + 706;
-        // console.log('height: ' + height);
+        // console.log('height: ' + height + ', reload: ' + reload);
         // console.log('scrollTop: ' + scrollTop);
         // console.log('scrollTop: ' + scrollTop + ', scrollBottom: ' + scrollBottom);
-        // console.log('reload: ' + reload);
         if (partialLoadLock === false && height <= reload)
         {
             partialLoadLock = false;
@@ -277,10 +275,10 @@ $(document).ready(function(){
 function rebuild_paritalContents()
 {
     console.log(arguments.callee.name);
-
+    var numOfLoadedContents = $('.content_title').length;
+    console.log("search_keyword: " + search_keyword + ", numOfLoadedContents: " + numOfLoadedContents);
     if (search_keyword == "")
     {
-        var numOfLoadedContents = $('.content_title').length;
         $.ajax({
             url : `http://localhost:3000/content/loadpartialcontent/${numOfLoadedContents}`,
             type: "GET",
@@ -288,28 +286,12 @@ function rebuild_paritalContents()
             {
                 var json = JSON.parse(data.body);
                 // console.log("get");
-                console.log(json);
+                // console.log(json);
                 for(var i = 0; i < json.length; i++)
                 {
-                    console.log(json[i]);
+                    // console.log(json[i]);
                     $('#content_list').append(`<tr class='content_title' id=${json[i].id}><td>${json[i].title}</td><td>${json[i].user}</td><td>${json[i].date}</td></tr>`);
                 }
-                // var json = JSON.parse(data.body);
-                // console.log(json);
-                // console.log(json.length);
-                // // console.log(json);
-                // $('#content_list').empty();
-                // var startPage = json.length > 0 ? json.length - 1 : 0;
-                // var loadPageLimit = json.length > 5 ? 5 : json.length;
-                // console.log(startPage);
-                // console.log(loadPageLimit);
-                // // for (var i = json.length - 1; i >= 0 ; i--)
-                // for (var i = startPage; i > startPage - loadPageLimit; i--)
-                // {
-                //     $('#content_list').append(`<tr class='content_title' id=${json[i].id}><td>${json[i].title}</td><td>${json[i].user}</td><td>${json[i].date}</td></tr>`);
-                // }
-                //data - response from server
-    
                 build_lookup_table();
     
                 partialLoadLock = false;
@@ -322,7 +304,6 @@ function rebuild_paritalContents()
     }
     else
     {
-        var numOfLoadedContents = $('.content_title').length;
         $.ajax({
             url : `http://localhost:3000/content/loadpartialcontent/${numOfLoadedContents}/keyword/${search_keyword}`,
             type: "GET",
@@ -330,10 +311,10 @@ function rebuild_paritalContents()
             {
                 var json = JSON.parse(data.body);
                 // console.log("get");
-                console.log(json);
+                // console.log(json);
                 for(var i = 0; i < json.length; i++)
                 {
-                    console.log(json[i]);
+                    // console.log(json[i]);
                     $('#content_list').append(`<tr class='content_title' id=${json[i].id}><td>${json[i].title}</td><td>${json[i].user}</td><td>${json[i].date}</td></tr>`);
                 }
     
@@ -353,7 +334,7 @@ function rebuild_paritalContents()
 
 $('#search_btn').click(function(e){
     search_keyword = $('#search').val();
-    console.log(search_keyword);
+    console.log("search_keyword: " + search_keyword);
     if (search_keyword == "")
     {
         rebuild_list();
@@ -365,9 +346,9 @@ $('#search_btn').click(function(e){
             type:"GET",
             success: function(data, textStatus, jqXHR)
             {
-                console.log("data: " + data);
+                // console.log("data: " + data);
                 var json = JSON.parse(data.body);
-                console.log("json: " + json);
+                // console.log("json: " + json);
                 // console.log(json.length);
     
                 $('#content_list').empty();
