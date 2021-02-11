@@ -6,7 +6,7 @@ rebuild_list();
 $('#user').val('');
 $('#pw').val('');
 
-var selected_id = null;
+var selectedId = null;
 var hellodata = {
     title : 'title',
     content: 'content',
@@ -98,7 +98,6 @@ $('#post_content').click(function(e){
         {
             // console.log(data);
             rebuild_list();
-            loadLatestContent();
             init_html_userInfo();
             init_html_content();
             //data - response from server
@@ -120,20 +119,12 @@ function rebuild_list()
         type: "GET",
         success: function(data, textStatus, jqXHR)
         {
-            // console.log("get");
-            // console.log(data.body);
-            var json = JSON.parse(data.body);
-            // console.log(json);
-            // console.log(json.length);
-            // console.log(json);
+            console.log(data);
             $('#content_list').empty();
-            // for (var i = json.length - 1; i >= 0 ; i--)
-            for (var i = 0; i < json.length; i++)
+            for (let d of data)
             {
-                $('#content_list').append(`<tr class='content_title' id=${json[i].id}><td>${json[i].title}</td><td>${json[i].user}</td><td>${json[i].date}</td></tr>`);
+                $('#content_list').append(`<tr class='content_title' id=${d.id}><td>${d.title}</td><td>${d.user}</td><td>${d.date}</td></tr>`);
             }
-            //data - response from server
-
             build_lookup_table();
         },
         error: function (jqXHR, textStatus, errorThrown)
@@ -142,13 +133,6 @@ function rebuild_list()
         }
     });
 }
-
-// post 이후 call
-function loadLatestContent()
-{
-
-}
-
 
 // page 처음 시작 시 로딩
 $('#get_content').click(function(e){
@@ -164,19 +148,15 @@ function build_lookup_table()
     // 게시글 조회
     $('.content_title').click(function(e){
         e.preventDefault();
-
-        selected_id = $(this).attr('id');
-        // console.log('id: ' + selected_id);
+        selectedId = $(this).attr('id');
         $.ajax({
-            url : `http://localhost:3000/content/${selected_id}`,
+            url : `http://localhost:3000/content/${selectedId}`,
             type: "GET",
             success: function(data, textStatus, jqXHR)
             {
-                // console.log("GET (" + jqXHR.status + "): " + data);
-                var json = JSON.parse(data);
-                set_json_userInfo(json.user, '');
-                set_html_userInfo(json.user, '');
-                set_html_content(json.title, json.content);
+                set_json_userInfo(data.user, '');
+                set_html_userInfo(data.user, '');
+                set_html_content(data.title, data.content);
             },
             error: function (jqXHR, textStatus, errorThrown)
             {
@@ -187,14 +167,14 @@ function build_lookup_table()
 }
     
 
-// page 갱신
+// content 갱신
 $('#put_content').click(function(e){
     e.preventDefault();
-
+    console.log("content 갱신");
     set_json_userInfo($('#user').val(), $('#pw').val());
     set_json_content($('#title').val(), $('#content').val());
     $.ajax({
-        url : `http://localhost:3000/content/${selected_id}`,
+        url : `http://localhost:3000/content/${selectedId}`,
         type: "PUT",
         data : get_json_form(),
         success: function(data, textStatus, jqXHR)
@@ -216,7 +196,7 @@ $('#delete_content').click(function(e){
 
     set_json_userInfo($('#user').val(), $('#pw').val());
     $.ajax({
-        url : `http://localhost:3000/content/${selected_id}`,
+        url : `http://localhost:3000/content/${selectedId}`,
         type: "DELETE",
         data : get_json_form(),
         success: function(data, textStatus, jqXHR)
@@ -248,7 +228,12 @@ function identifyAlert(statusCode, msg)
     }
     if (statusCode === 403)
     {
-        alert('password 를 확인하세요.');
+        // alert('password 를 확인하세요.');
+        console.log('마지막 data');
+    }
+    if (statusCode === 500)
+    {
+        console.log('???');
     }
 }
 
@@ -275,12 +260,13 @@ $(document).ready(function(){
 function rebuild_paritalContents()
 {
     console.log(arguments.callee.name);
-    var numOfLoadedContents = $('.content_title').length;
-    console.log("search_keyword: " + search_keyword + ", numOfLoadedContents: " + numOfLoadedContents);
+
+    var nLoadedContents = $('.content_title').length;
+    console.log("search_keyword: " + search_keyword + ", nLoadedContents: " + nLoadedContents);
     if (search_keyword == "")
     {
         $.ajax({
-            url : `http://localhost:3000/content/loadpartialcontent/${numOfLoadedContents}`,
+            url : `http://localhost:3000/content/loadpartialcontent/${nLoadedContents}`,
             type: "GET",
             success: function(data, textStatus, jqXHR)
             {
@@ -298,20 +284,20 @@ function rebuild_paritalContents()
             },
             error: function (jqXHR, textStatus, errorThrown)
             {
-                identifyAlert(jqXHR.status);
+                // identifyAlert(jqXHR.status);
             }
         });
     }
     else
     {
         $.ajax({
-            url : `http://localhost:3000/content/loadpartialcontent/${numOfLoadedContents}/keyword/${search_keyword}`,
+            url : `http://localhost:3000/content/loadpartialcontent/${nLoadedContents}/keyword/${search_keyword}`,
             type: "GET",
             success: function(data, textStatus, jqXHR)
             {
                 var json = JSON.parse(data.body);
                 // console.log("get");
-                // console.log(json);
+                console.log(json);
                 for(var i = 0; i < json.length; i++)
                 {
                     // console.log(json[i]);
@@ -324,7 +310,7 @@ function rebuild_paritalContents()
             },
             error: function (jqXHR, textStatus, errorThrown)
             {
-                identifyAlert(jqXHR.status);
+                // identifyAlert(jqXHR.status);
             }
         });
     }
@@ -347,26 +333,31 @@ $('#search_btn').click(function(e){
             success: function(data, textStatus, jqXHR)
             {
                 // console.log("data: " + data);
-                var json = JSON.parse(data.body);
+                // var json = JSON.parse(data.body);
                 // console.log("json: " + json);
                 // console.log(json.length);
     
                 $('#content_list').empty();
                 // for (var i = json.length - 1; i >= 0 ; i--)
-                for (var i = 0; i < json.length; i++)
+                for (let d of data)
                 {
-                    $('#content_list').append(`<tr class='content_title' id=${json[i].id}><td>${json[i].title}</td><td>${json[i].user}</td><td>${json[i].date}</td></tr>`);
+                    $('#content_list').append(`<tr class='content_title' id=${d.id}><td>${d.title}</td><td>${d.user}</td><td>${d.date}</td></tr>`);
                 }
 
                 build_lookup_table();
             },
             error: function(jqXHR, textStatus, errorThrown)
             {
-                console.log(jqXHR.status);
-                // identifyAlert(jqXHR.status);
+                // console.log(jqXHR.status);
+                identifyAlert(jqXHR.status);
             }
     
     
         });
     }
 })
+
+
+class Content{
+
+}
