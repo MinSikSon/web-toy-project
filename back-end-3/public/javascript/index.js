@@ -231,6 +231,10 @@ function identifyAlert(statusCode, msg)
         // alert('password 를 확인하세요.');
         console.log('마지막 data');
     }
+    if (statusCode === 500)
+    {
+        console.log('???');
+    }
 }
 
 // scroll event
@@ -329,23 +333,23 @@ $('#search_btn').click(function(e){
             success: function(data, textStatus, jqXHR)
             {
                 // console.log("data: " + data);
-                var json = JSON.parse(data.body);
+                // var json = JSON.parse(data.body);
                 // console.log("json: " + json);
                 // console.log(json.length);
     
                 $('#content_list').empty();
                 // for (var i = json.length - 1; i >= 0 ; i--)
-                for (var i = 0; i < json.length; i++)
+                for (let d of data)
                 {
-                    $('#content_list').append(`<tr class='content_title' id=${json[i].id}><td>${json[i].title}</td><td>${json[i].user}</td><td>${json[i].date}</td></tr>`);
+                    $('#content_list').append(`<tr class='content_title' id=${d.id}><td>${d.title}</td><td>${d.user}</td><td>${d.date}</td></tr>`);
                 }
 
                 build_lookup_table();
             },
             error: function(jqXHR, textStatus, errorThrown)
             {
-                console.log(jqXHR.status);
-                // identifyAlert(jqXHR.status);
+                // console.log(jqXHR.status);
+                identifyAlert(jqXHR.status);
             }
     
     

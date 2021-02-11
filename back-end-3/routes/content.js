@@ -84,7 +84,7 @@ router.get('/', function(req, res, next){
 
 router.get('/loadpartialcontent/:numOfLoadedContents', function(req, res, next){
   var numOfLoadedContents = req.params.numOfLoadedContents;
-  db_async.query(contentRepoImpl.query_get_content_5(numOfLoadedContents), function (err, results, fields) {
+  db_async.query(contentRepoImpl.query_get_partial(numOfLoadedContents), function (err, results, fields) {
     console.log("numOfLoadedContents: " + numOfLoadedContents);
     if (err) {
       console.log(err);
@@ -318,7 +318,9 @@ router.get('/search/:keyWord', function(req, res, next)
 {
   console.log('/search/:keyWord');
   var nKeyWord = req.params.keyWord;
-  console.log(nKeyWord);
+  console.log("nKeyWord: " + nKeyWord);
+  // ORDER BY id DESC 
+  // console.log(`SELECT * FROM topic ORDER BY id DESC WHERE (title LIKE %``${nKeyWord}``% OR description LIKE %``${nKeyWord}``%)`);
   db_async.query(contentRepoImpl.query_get_by_search(nKeyWord), function(error, results){
     if (error)
     {
@@ -329,10 +331,18 @@ router.get('/search/:keyWord', function(req, res, next)
     {
       console.log(results);
       console.log("!!!!!!!!!!!!!!!");
-      var response = createResponseContentArray(results);
-      // res.send(response);
-      console.log(response);
-      res.send(response);
+      let contents = [];
+      for (let result of results)
+      {
+        contents.push(contentRepoImpl.contentForm(
+          result.id,
+          result.title,
+          result.description,
+          result.author_id,
+          result.created));
+      }
+      console.log(contents);
+      res.send(contents);
     }
   })
 });
