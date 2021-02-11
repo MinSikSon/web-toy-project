@@ -1,21 +1,5 @@
-// let mysql_async = require('mysql');
-
-// let mysql = require('sync-mysql');
-// let db = new mysql({
-//   host: 'localhost',
-//   user: 'nodejs',
-//   password: '111111',
-//   database: 'opentutorials'
-// });
-
 class ContentRepo
 {
-  // static db_async = mysql_async.createConnection({
-  //   host: 'localhost',
-  //   user: 'nodejs',
-  //   password: '111111', database: 'opentutorials'
-  // });
-
   query_get()
   {
     return `SELECT * FROM topic ORDER BY id DESC LIMIT 0, 5`;
@@ -25,7 +9,6 @@ class ContentRepo
     return `SELECT * FROM topic ORDER BY id DESC LIMIT ${numOfLoadedContents},5`;
   }
 
-  // NOTE: 뭔가 오류가 있음. 수정 필요.
   query_get_by_search(nKeyWord)
   {
     return `SELECT * FROM topic WHERE (title LIKE '%${nKeyWord}%' OR description LIKE '%${nKeyWord}%') ORDER BY id DESC`;
@@ -50,6 +33,22 @@ class ContentRepo
       'user': user,
       'date': date
     };
+  }
+
+  createContentArray(results)
+  {
+    var contents = [];
+    for (let result of results)
+    {
+      contents.push(this.contentForm(
+        result.id,
+        result.title,
+        result.description,
+        result.author_id,
+        result.created
+      ));
+    }
+    return contents;
   }
 }
 

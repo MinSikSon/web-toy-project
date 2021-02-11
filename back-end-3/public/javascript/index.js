@@ -261,12 +261,12 @@ function rebuild_paritalContents()
 {
     console.log(arguments.callee.name);
 
-    var numOfLoadedContents = $('.content_title').length;
-    console.log("search_keyword: " + search_keyword + ", numOfLoadedContents: " + numOfLoadedContents);
+    var nLoadedContents = $('.content_title').length;
+    console.log("search_keyword: " + search_keyword + ", nLoadedContents: " + nLoadedContents);
     if (search_keyword == "")
     {
         $.ajax({
-            url : `http://localhost:3000/content/loadpartialcontent/${numOfLoadedContents}`,
+            url : `http://localhost:3000/content/loadpartialcontent/${nLoadedContents}`,
             type: "GET",
             success: function(data, textStatus, jqXHR)
             {
@@ -291,7 +291,7 @@ function rebuild_paritalContents()
     else
     {
         $.ajax({
-            url : `http://localhost:3000/content/loadpartialcontent/${numOfLoadedContents}/keyword/${search_keyword}`,
+            url : `http://localhost:3000/content/loadpartialcontent/${nLoadedContents}/keyword/${search_keyword}`,
             type: "GET",
             success: function(data, textStatus, jqXHR)
             {
