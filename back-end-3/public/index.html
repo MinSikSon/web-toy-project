@@ -1,13 +1,17 @@
 <!doctype html>
 <html>
 <head>
-    <title>CHAT!</title>
+    <title>Instagram 🚀</title>
     <meta charset="utf-8">
     <!-- background-image: url('images/background.jpg'); -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Gothic+A1&display=swap" rel="stylesheet">
     <style>
+        html{
+            font-family: 'Gothic A1', sans-serif;
+        }
         body{
             color:greenyellow;
-            font-size: 24px;
             position: relative;
             z-index: 1;
         }
@@ -25,10 +29,20 @@
         }
         input{
             background-color:transparent;
+            width:100%;
         }
-        textarea{
+        input#search{
+            background-color:transparent;
+            width:60%;
+        }
+        th, td{
+            font-size:3rem;
+        }
+        #content{
             background-color:transparent;
             width: 100%;
+            height: 10%;
+            font-size:3rem;
         }
     </style>
 
@@ -37,9 +51,9 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 </head>
 <body>
-    <h1><a href="/">🎾 게시판🎾</a></h1>
+    <h1><a href="/">Instagram 🚀</a>  <input id='search' placeholder="검색어"><button id='search_btn'>찾기</button></h1>
 
-    <h3>🏛 글 생성 및 조회 🏛</h3>
+    <h1>🏛 글 생성 및 조회 🏛</h1>
     <table class='table'>
         <thead>
             <tr>
@@ -59,7 +73,7 @@
     </table>
     <textarea id='content' placeholder="content" cols="67" rows="10"></textarea>
     
-    <h3>🐷 글 목록 🐷</h3> <input id='search' placeholder="검색어"><button id='search_btn'>찾기</button>
+    <h1>🐷 글 목록 🐷</h1> 
     <table class='table table-hover'>
         <thead>
             <tr>

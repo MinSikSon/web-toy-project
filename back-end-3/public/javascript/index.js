@@ -162,30 +162,26 @@ function build_lookup_table()
     console.log(arguments.callee.name);
 
     // 게시글 조회
-    $('.content_title').click(function(e){
+    $('.content_title').click(function (e) {
         e.preventDefault();
 
         selected_id = $(this).attr('id');
         // console.log('id: ' + selected_id);
         $.ajax({
-            url : `http://localhost:3000/content/${selected_id}`,
+            url: `http://localhost:3000/content/${selected_id}`,
             type: "GET",
-            success: function(data, textStatus, jqXHR)
-            {
-                // console.log("GET (" + jqXHR.status + "): " + data);
-                var json = JSON.parse(data);
-                set_json_userInfo(json.user, '');
-                set_html_userInfo(json.user, '');
-                set_html_content(json.title, json.content);
+            success: function (data, textStatus, jqXHR) {
+                console.log(data.title);
+                set_json_userInfo(data.user, '');
+                set_html_userInfo(data.user, '');
+                set_html_content(data.title, data.content);
             },
-            error: function (jqXHR, textStatus, errorThrown)
-            {
+            error: function (jqXHR, textStatus, errorThrown) {
                 identifyAlert(jqXHR.status);
             }
         });
     });
 }
-    
 
 // page 갱신
 $('#put_content').click(function(e){
@@ -259,7 +255,7 @@ $(document).ready(function(){
         var scrollTop = $(window).scrollTop();
         // var scrollBottom = $(window).scrollBottom();
         var reload = scrollTop + 706;
-        // console.log('height: ' + height + ', reload: ' + reload);
+        console.log('height: ' + height + ', reload: ' + reload);
         // console.log('scrollTop: ' + scrollTop);
         // console.log('scrollTop: ' + scrollTop + ', scrollBottom: ' + scrollBottom);
         if (partialLoadLock === false && height <= reload)
